@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Docs/">
+    <File Path="Api.md" />
+  </Folder>
+  <Project Path="FoodDelivery.api/FoodDelivery.api.csproj" />
+  <Project Path="FoodDelivery.Application/FoodDelivery.Application.csproj" />
+  <Project Path="FoodDelivery.Contracts/FoodDelivery.Contracts.csproj" />
+  <Project Path="FoodDelivery.Domain/FoodDelivery.Domain.csproj" />
+  <Project Path="FoodDelivery.Infrastructure/FoodDelivery.Infrastructure.csproj" />
+</Solution>
