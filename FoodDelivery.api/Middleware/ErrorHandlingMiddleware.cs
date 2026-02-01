@@ -27,8 +27,11 @@ namespace FoodDelivery.Api.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            // ✅ 1) Map status codes (add FluentValidation)
             var statusCode = exception switch
             {
+                FluentValidation.ValidationException => StatusCodes.Status400BadRequest,
+
                 ArgumentException => StatusCodes.Status400BadRequest,
                 UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
                 AccessViolationException => StatusCodes.Status403Forbidden,
@@ -47,8 +50,20 @@ namespace FoodDelivery.Api.Middleware
                     : "An error occurred while processing your request.",
                 Instance = context.Request.Path,
                 Type = $"https://httpstatuses.com/{statusCode}"
-                
             };
+
+            // ✅ 2) Include validation errors in response body (super useful)
+            if (exception is FluentValidation.ValidationException fvEx)
+            {
+                var errors = fvEx.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                problemDetails.Extensions["errors"] = errors;
+            }
 
             problemDetails.Extensions["traceId"] = context.TraceIdentifier;
 
@@ -56,8 +71,7 @@ namespace FoodDelivery.Api.Middleware
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = statusCode;
 
-            await context.Response.WriteAsync(
-                JsonSerializer.Serialize(problemDetails));
+            await context.Response.WriteAsync(JsonSerializer.Serialize(problemDetails));
         }
 
         private static string GetTitle(int statusCode) =>
