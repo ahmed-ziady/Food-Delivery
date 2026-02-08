@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FoodDelivery.Application.Authentication.Commands.Register;
 using FoodDelivery.Application.Common.Behaviors;
+using FoodDelivery.Application.Menus.Commands.CreateMenu;
 using FoodDelivery.Application.Services.Authentication.Commands;
 using FoodDelivery.Application.Services.Authentication.Common;
 using MediatR;
@@ -20,6 +21,11 @@ namespace FoodDelivery.Application
             {
                 cfg.RegisterServicesFromAssembly(
                     typeof(RegisterCommandHandler).Assembly);
+            });
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(
+                    typeof(CreateMenuCommandHandler).Assembly);
             });
             services.AddScoped(typeof(IPipelineBehavior<,>),typeof( ValidationBehavior<,>));
             services.AddValidatorsFromAssembly(

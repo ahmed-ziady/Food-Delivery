@@ -8,12 +8,15 @@ namespace FoodDelivery.Infrastructure.Persistence
 {
     internal class UserRepository : IUserRepository
     {
-        private static List<User> _users = [];
+        private readonly static List<User> _users = [];
         public void Add(User user)
         {
           _users.Add(user);
         }
-
+        public User? GetUserById(Guid id)
+        {
+           return _users.SingleOrDefault(u=>u.Id == id);
+        }
         public User? GetUserByEmail(string email)
         {
            return _users.SingleOrDefault(u=>u.Email == email);

@@ -2,6 +2,9 @@
   <Folder Name="/Docs/">
     <File Path="Api.md" />
   </Folder>
+  <Folder Name="/Docs/DomainModels/">
+    <File Path="Aggregates.Menu.md" />
+  </Folder>
   <Project Path="FoodDelivery.api/FoodDelivery.api.csproj" />
   <Project Path="FoodDelivery.Application/FoodDelivery.Application.csproj" />
   <Project Path="FoodDelivery.Contracts/FoodDelivery.Contracts.csproj" />

@@ -6,7 +6,7 @@ using MediatR;
 
 namespace FoodDelivery.Application.Authentication.Commands.Login
 {
-    public class LoginCommandHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository) : IRequestHandler<LoginCommand, AuthenticationResult>
+    public class LoginCommandHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository,IRefreshTokenRepository refreshTokenRepository) : IRequestHandler<LoginCommand, AuthenticationResult>
     {
         public async Task<AuthenticationResult> Handle(LoginCommand command, CancellationToken cancellationToken)
         {
@@ -22,15 +22,13 @@ namespace FoodDelivery.Application.Authentication.Commands.Login
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            var token = jwtTokenGenerator.GenerateToken(
-                user.Id,
-                user.FirstName,
-                user.LastName,
-                user.Email);
-
+            var accessToken = jwtTokenGenerator.GenerateAccessToken(
+               user);
+            var refreshToken = jwtTokenGenerator.GenerateRefreshToken(user.Id);
+            await refreshTokenRepository.AddAsync(refreshToken);
             return new AuthenticationResult(
                user,
-                token);
+                accessToken,refreshToken.Token);
         }
     }
 }

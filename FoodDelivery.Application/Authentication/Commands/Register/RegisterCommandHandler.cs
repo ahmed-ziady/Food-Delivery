@@ -7,7 +7,7 @@ using MediatR;
 namespace FoodDelivery.Application.Authentication.Commands.Register
 {
     public class RegisterCommandHandler(IJwtTokenGenerator jwtTokenGenerator,
-        IUserRepository userRepository) : IRequestHandler<RegisterCommand, AuthenticationResult>
+        IUserRepository userRepository,IRefreshTokenRepository refreshTokenRepository ) : IRequestHandler<RegisterCommand, AuthenticationResult>
     {
         public async Task<AuthenticationResult> Handle(RegisterCommand command, CancellationToken cancellationToken)
 
@@ -31,15 +31,13 @@ namespace FoodDelivery.Application.Authentication.Commands.Register
 
             userRepository.Add(user);
 
-            var token = jwtTokenGenerator.GenerateToken(
-                user.Id,
-                user.FirstName,
-                user.LastName,
-                user.Email);
-
+            var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
+            var refreshToken = jwtTokenGenerator.GenerateRefreshToken(user.Id);
+            await refreshTokenRepository.AddAsync(refreshToken);
             return new AuthenticationResult(
                 user,
-                token);
+                accessToken,
+                refreshToken.Token);
         }
     }
 }

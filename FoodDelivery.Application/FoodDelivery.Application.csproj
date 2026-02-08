@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Menus\Common\" />
     <Folder Include="Services\Authentication\Queries\" />
   </ItemGroup>
 

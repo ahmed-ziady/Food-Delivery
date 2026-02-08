@@ -1,4 +1,6 @@
 ﻿using FoodDelivery.api.Common.Mapping;
+using FoodDelivery.Api.Extensions;
+using Microsoft.OpenApi.Models;
 
 namespace FoodDelivery.api
 {
@@ -6,11 +8,12 @@ namespace FoodDelivery.api
     {
         public static IServiceCollection AddPresentation(this IServiceCollection services)
         {
-            // Add API services here (e.g., controllers, Swagger, etc.)
             services.AddMappings();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerDocumentation(); 
+           
+
             return services;
         }
     }
