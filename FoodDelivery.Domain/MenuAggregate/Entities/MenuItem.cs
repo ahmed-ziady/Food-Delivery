@@ -6,17 +6,20 @@ namespace FoodDelivery.Domain.MenuAggregate.Entities
 {
     public sealed class MenuItem : Entity<MenuItemId>
     {
-        private MenuItem() { } // EF Core
+        // EF Core only
+        private MenuItem() { }
 
         private MenuItem(
             MenuItemId id,
             string name,
             string description,
-            Price price) : base(id)
+            Price price,
+            AverageRating averageRating) : base(id)
         {
             Name = name;
             Description = description;
             Price = price;
+            AverageRating = averageRating ?? AverageRating.Empty();
         }
 
         public string Name { get; private set; } = null!;
@@ -24,11 +27,11 @@ namespace FoodDelivery.Domain.MenuAggregate.Entities
         public Price Price { get; private set; } = null!;
         public AverageRating AverageRating { get; private set; } = null!;
 
+        // ---------- Factory ----------
         public static MenuItem Create(
             string name,
             string description,
-            Price price
-            )
+            Price price)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Menu item name is required.", nameof(name));
@@ -39,10 +42,12 @@ namespace FoodDelivery.Domain.MenuAggregate.Entities
                 MenuItemId.CreateUnique(),
                 name.Trim(),
                 description?.Trim() ?? string.Empty,
-                price);
+                price,
+                AverageRating.Empty() // ✅ NEVER NULL
+            );
         }
 
-        // -------- Behavior --------
+        // ---------- Behavior ----------
         public void AddRating(Rating rating)
         {
             ArgumentNullException.ThrowIfNull(rating);

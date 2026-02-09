@@ -2,13 +2,11 @@
 
 namespace FoodDelivery.Domain.Common.ValueObjects
 {
-    /// <summary>
-    /// Represents a rating value between 1 and 5.
-    /// </summary>
     public sealed class Rating : ValueObject
     {
-            public Rating() { }
         public int Value { get; }
+
+        private Rating() { } // EF Core only
 
         private Rating(int value)
         {
@@ -21,9 +19,6 @@ namespace FoodDelivery.Domain.Common.ValueObjects
 
         public static Rating Create(int value)
             => new(value);
-
-        public bool IsMax => Value == 5;
-        public bool IsMin => Value == 1;
 
         protected override IEnumerable<object?> GetEqualityComponents()
         {

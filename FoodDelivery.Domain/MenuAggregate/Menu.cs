@@ -15,6 +15,7 @@ namespace FoodDelivery.Domain.MenuAggregate
         private readonly List<DinnerId> _dinnerIds = [];
 
         private Menu() { }
+
         private Menu(
             MenuId id,
             string name,
@@ -79,7 +80,8 @@ namespace FoodDelivery.Domain.MenuAggregate
         {
             ArgumentNullException.ThrowIfNull(section);
 
-            if (_sections.Any(s => s.Name == section.Name))
+            if (_sections.Any(s =>
+                s.Name.Equals(section.Name, StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidOperationException("Section with same name already exists.");
 
             _sections.Add(section);
@@ -100,6 +102,9 @@ namespace FoodDelivery.Domain.MenuAggregate
         {
             ArgumentNullException.ThrowIfNull(reviewId);
             ArgumentNullException.ThrowIfNull(rating);
+
+            if (_menuReviewIds.Contains(reviewId))
+                return;
 
             _menuReviewIds.Add(reviewId);
             AverageRating = AverageRating.AddRating(rating);
@@ -131,4 +136,5 @@ namespace FoodDelivery.Domain.MenuAggregate
             UpdatedDateTime = DateTime.UtcNow;
         }
     }
+
 }

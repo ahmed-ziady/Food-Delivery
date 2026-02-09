@@ -4,9 +4,10 @@ namespace FoodDelivery.Domain.Common.ValueObjects
 {
     public sealed class AverageRating : ValueObject
     {
-        public AverageRating() { }
         public double Value { get; }
         public int NumberOfRatings { get; }
+
+        private AverageRating() { } // EF Core only
 
         private AverageRating(double value, int numberOfRatings)
         {

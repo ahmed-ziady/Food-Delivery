@@ -54,8 +54,8 @@ namespace FoodDelivery.Application.Menus.Commands.CreateMenu
                 .MaximumLength(100);
 
             RuleFor(x => x.Description).NotDefaultPlaceholder()
-                .NotEmpty().WithMessage("Item description is required.")
-                .MaximumLength(500);
+                
+                .MaximumLength(400).WithMessage("Max length 400");
 
             RuleFor(x => x.Price)
                 .GreaterThanOrEqualTo(0)

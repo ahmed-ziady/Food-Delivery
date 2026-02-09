@@ -62,9 +62,6 @@ namespace FoodDelivery.Domain.MenuAggregate.Entities
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (_menuItems.Any(i => i.Name == item.Name))
-                throw new InvalidOperationException("Menu item with same name already exists.");
-
             _menuItems.Add(item);
         }
 

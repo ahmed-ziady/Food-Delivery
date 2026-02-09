@@ -16,15 +16,16 @@ namespace FoodDelivery.Application.Common.Extensions
             "xxx"
             };
 
-        public static IRuleBuilderOptions<T, string> NotDefaultPlaceholder<T>(
-            this IRuleBuilder<T, string> ruleBuilder)
+        public static IRuleBuilderOptions<T, string?> NotDefaultPlaceholder<T>(
+     this IRuleBuilder<T, string?> ruleBuilder)
         {
             return ruleBuilder.Must(value =>
-                !string.IsNullOrWhiteSpace(value) &&
+                string.IsNullOrWhiteSpace(value) ||   
                 !InvalidDefaults.Contains(value.Trim())
             )
             .WithMessage("Value must be a meaningful text.");
         }
+
     }
 
 }

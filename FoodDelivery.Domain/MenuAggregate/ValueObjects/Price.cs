@@ -5,7 +5,7 @@ namespace FoodDelivery.Domain.MenuAggregate.ValueObjects
     public sealed class Price : ValueObject
     {
         public Price() { }
-        public decimal Amount { get; }
+        public decimal Amount { get; private set; }
 
         private Price(decimal amount)
         {
