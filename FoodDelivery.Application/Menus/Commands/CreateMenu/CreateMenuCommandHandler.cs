@@ -1,9 +1,9 @@
 ﻿using FoodDelivery.Application.Common.Interfaces.Persistence;
-using FoodDelivery.Domain.Host.ValueObjects;
-using FoodDelivery.Domain.Menu.Entities;
-using FoodDelivery.Domain.Menu.ValueObjects;
+using FoodDelivery.Domain.Common.ValueObjects;
+using FoodDelivery.Domain.HostAggregate.ValueObjects;
 using FoodDelivery.Domain.MenuAggregate;
 using FoodDelivery.Domain.MenuAggregate.Entities;
+using FoodDelivery.Domain.MenuAggregate.ValueObjects;
 using MediatR;
 
 namespace FoodDelivery.Application.Menus.Commands.CreateMenu
@@ -38,6 +38,8 @@ namespace FoodDelivery.Application.Menus.Commands.CreateMenu
                         name: itemRequest.Name,
                         description: itemRequest.Description,
                         price: Price.Create(itemRequest.Price)
+                        
+
                     );
 
                     section.AddMenuItem(item);

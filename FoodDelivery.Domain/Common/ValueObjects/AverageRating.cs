@@ -4,6 +4,7 @@ namespace FoodDelivery.Domain.Common.ValueObjects
 {
     public sealed class AverageRating : ValueObject
     {
+        public AverageRating() { }
         public double Value { get; }
         public int NumberOfRatings { get; }
 

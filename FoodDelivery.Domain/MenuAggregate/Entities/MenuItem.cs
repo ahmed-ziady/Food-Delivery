@@ -1,10 +1,13 @@
 ﻿using FoodDelivery.Domain.Common.Models;
-using FoodDelivery.Domain.Menu.ValueObjects;
+using FoodDelivery.Domain.Common.ValueObjects;
+using FoodDelivery.Domain.MenuAggregate.ValueObjects;
 
-namespace FoodDelivery.Domain.Menu.Entities
+namespace FoodDelivery.Domain.MenuAggregate.Entities
 {
     public sealed class MenuItem : Entity<MenuItemId>
     {
+        private MenuItem() { } // EF Core
+
         private MenuItem(
             MenuItemId id,
             string name,
@@ -16,14 +19,16 @@ namespace FoodDelivery.Domain.Menu.Entities
             Price = price;
         }
 
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public Price Price { get; private set; }
+        public string Name { get; private set; } = null!;
+        public string Description { get; private set; } = null!;
+        public Price Price { get; private set; } = null!;
+        public AverageRating AverageRating { get; private set; } = null!;
 
         public static MenuItem Create(
             string name,
             string description,
-            Price price)
+            Price price
+            )
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Menu item name is required.", nameof(name));
@@ -38,6 +43,17 @@ namespace FoodDelivery.Domain.Menu.Entities
         }
 
         // -------- Behavior --------
+        public void AddRating(Rating rating)
+        {
+            ArgumentNullException.ThrowIfNull(rating);
+            AverageRating = AverageRating.AddRating(rating);
+        }
+
+        public void RemoveRating(Rating rating)
+        {
+            ArgumentNullException.ThrowIfNull(rating);
+            AverageRating = AverageRating.RemoveRating(rating);
+        }
 
         public void ChangePrice(Price newPrice)
         {

@@ -1,9 +1,11 @@
 ﻿using FoodDelivery.Domain.Common.Models;
 
-namespace FoodDelivery.Domain.Host.ValueObjects
+namespace FoodDelivery.Domain.HostAggregate.ValueObjects
 {
+
     public sealed class HostId : ValueObject
     {
+                public HostId() { }
         public Guid Value { get; }
 
         private HostId(Guid value)

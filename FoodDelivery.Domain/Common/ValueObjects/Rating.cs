@@ -7,6 +7,7 @@ namespace FoodDelivery.Domain.Common.ValueObjects
     /// </summary>
     public sealed class Rating : ValueObject
     {
+            public Rating() { }
         public int Value { get; }
 
         private Rating(int value)

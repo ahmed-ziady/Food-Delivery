@@ -3,17 +3,12 @@
     public abstract class Entity<TId> : IEquatable<Entity<TId>>
         where TId : notnull
     {
-        public TId Id { get; protected set; }
-
+        protected Entity() { }
         protected Entity(TId id)
         {
             Id = id;
         }
-
-        protected Entity()
-        {
-            // Required by ORM
-        }
+        public TId Id { get; protected set; } = default!;
 
         public override bool Equals(object? obj)
         {

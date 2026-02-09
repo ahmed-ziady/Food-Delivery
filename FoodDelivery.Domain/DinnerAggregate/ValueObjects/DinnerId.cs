@@ -1,9 +1,10 @@
 ﻿using FoodDelivery.Domain.Common.Models;
 
-namespace FoodDelivery.Domain.Dinner.ValueObjects
+namespace FoodDelivery.Domain.DinnerAggregate.ValueObjects
 {
     public sealed class DinnerId : ValueObject
     {
+                public DinnerId() { }
         public Guid Value { get; }
 
         private DinnerId(Guid value)

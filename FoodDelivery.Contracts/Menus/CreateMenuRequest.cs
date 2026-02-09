@@ -14,6 +14,5 @@
     public record MenuItem(
         string Name,
         string Description,
-        decimal Price
-    );
+        decimal Price    );
 }

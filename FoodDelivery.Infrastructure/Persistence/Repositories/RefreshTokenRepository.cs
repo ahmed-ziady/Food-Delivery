@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Text;
 
-namespace FoodDelivery.Infrastructure.Persistence
+namespace FoodDelivery.Infrastructure.Persistence.Repositories
 {
     internal class RefreshTokenRepository : IRefreshTokenRepository
     {

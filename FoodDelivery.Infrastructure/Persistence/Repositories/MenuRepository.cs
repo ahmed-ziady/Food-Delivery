@@ -4,14 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoodDelivery.Infrastructure.Persistence
+namespace FoodDelivery.Infrastructure.Persistence.Repositories
 {
-    public class MenuRepository : IMenuRepository
+    public class MenuRepository(FoodDeliveryDbContext _dbContext) : IMenuRepository
     {
-        private static readonly List<Menu> _menus = [];
+      
         public void Add(Menu menu)
         {
-           _menus.Add(menu);
+            _dbContext.Add(menu);
+            _dbContext.SaveChanges();
         }
     }
 }

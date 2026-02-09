@@ -1,12 +1,12 @@
 ﻿using FoodDelivery.Domain.Common.Models;
 using FoodDelivery.Domain.Common.ValueObjects;
-using FoodDelivery.Domain.Menu.Entities;
-using FoodDelivery.Domain.Menu.ValueObjects;
+using FoodDelivery.Domain.MenuAggregate.ValueObjects;
 
 namespace FoodDelivery.Domain.MenuAggregate.Entities
 {
     public sealed class MenuSection : Entity<MenuSectionId>
     {
+        public MenuSection() { }
         private readonly List<MenuItem> _menuItems = [];
 
         private MenuSection(
@@ -16,12 +16,11 @@ namespace FoodDelivery.Domain.MenuAggregate.Entities
         {
             Name = name;
             Description = description;
-            AverageRating = AverageRating.Empty();
+            
         }
 
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public AverageRating AverageRating { get; private set; }
+        public string Name { get; private set; } = null!;
+        public string Description { get; private set; }=null!;
 
         public IReadOnlyCollection<MenuItem> MenuItems => _menuItems.AsReadOnly();
 
@@ -77,16 +76,6 @@ namespace FoodDelivery.Domain.MenuAggregate.Entities
                 throw new InvalidOperationException("Menu item not found.");
         }
 
-        public void AddRating(Rating rating)
-        {
-            ArgumentNullException.ThrowIfNull(rating);
-            AverageRating = AverageRating.AddRating(rating);
-        }
-
-        public void RemoveRating(Rating rating)
-        {
-            ArgumentNullException.ThrowIfNull(rating);
-            AverageRating = AverageRating.RemoveRating(rating);
-        }
+      
     }
 }

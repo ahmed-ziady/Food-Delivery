@@ -2,6 +2,7 @@
 {
     public abstract class ValueObject : IEquatable<ValueObject>
     {
+        protected ValueObject() { }
         protected abstract IEnumerable<object?> GetEqualityComponents();
 
         public override bool Equals(object? obj)

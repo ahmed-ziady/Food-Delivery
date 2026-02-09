@@ -4,7 +4,9 @@ using FoodDelivery.Application.Common.Interfaces.Persistence;
 using FoodDelivery.Infrastructure.Authentication;
 using FoodDelivery.Infrastructure.Authentication.Services;
 using FoodDelivery.Infrastructure.Persistence;
+using FoodDelivery.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -24,6 +26,8 @@ namespace FoodDelivery.Infrastructure
         public static IServiceCollection AddPersistence(this IServiceCollection services,
             ConfigurationManager configuration)
         {
+            services.AddDbContext<FoodDeliveryDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IMenuRepository, MenuRepository>();

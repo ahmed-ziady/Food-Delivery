@@ -4,6 +4,7 @@ namespace FoodDelivery.Domain.MenuReview.ValueObjects
 {
     public sealed class MenuReviewId : ValueObject
     {
+            public MenuReviewId() { }
         public Guid Value { get; }
 
         private MenuReviewId(Guid value)

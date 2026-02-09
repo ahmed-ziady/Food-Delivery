@@ -6,6 +6,7 @@ namespace FoodDelivery.Domain.Entities
 {
     public class RefreshToken
     {
+        public RefreshToken() { }
         public Guid Id { get; set; }
         public string Token { get; set; } = null!;
         public DateTime ExpiresAt { get; set; }

@@ -1,9 +1,9 @@
 ﻿using FoodDelivery.Domain.Common.Models;
 using FoodDelivery.Domain.Common.ValueObjects;
-using FoodDelivery.Domain.Dinner.ValueObjects;
-using FoodDelivery.Domain.Host.ValueObjects;
-using FoodDelivery.Domain.Menu.ValueObjects;
+using FoodDelivery.Domain.DinnerAggregate.ValueObjects;
+using FoodDelivery.Domain.HostAggregate.ValueObjects;
 using FoodDelivery.Domain.MenuAggregate.Entities;
+using FoodDelivery.Domain.MenuAggregate.ValueObjects;
 using FoodDelivery.Domain.MenuReview.ValueObjects;
 
 namespace FoodDelivery.Domain.MenuAggregate
@@ -14,6 +14,7 @@ namespace FoodDelivery.Domain.MenuAggregate
         private readonly List<MenuReviewId> _menuReviewIds = [];
         private readonly List<DinnerId> _dinnerIds = [];
 
+        private Menu() { }
         private Menu(
             MenuId id,
             string name,
@@ -28,12 +29,12 @@ namespace FoodDelivery.Domain.MenuAggregate
             UpdatedDateTime = CreatedDateTime;
         }
 
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public HostId HostId { get; private set; }
-        public AverageRating AverageRating { get; private set; }
+        public string Name { get; private set; } = null!;
+        public string Description { get; private set; } = null!;
+        public HostId HostId { get; private set; } = null!;
+        public AverageRating AverageRating { get; private set; } = null!;
 
-        public DateTime CreatedDateTime { get; }
+        public DateTime CreatedDateTime { get; private set; }
         public DateTime UpdatedDateTime { get; private set; }
 
         public IReadOnlyCollection<MenuSection> Sections => _sections.AsReadOnly();

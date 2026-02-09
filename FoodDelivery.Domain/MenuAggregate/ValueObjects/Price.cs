@@ -1,9 +1,10 @@
 ﻿using FoodDelivery.Domain.Common.Models;
 
-namespace FoodDelivery.Domain.Menu.ValueObjects
+namespace FoodDelivery.Domain.MenuAggregate.ValueObjects
 {
     public sealed class Price : ValueObject
     {
+        public Price() { }
         public decimal Amount { get; }
 
         private Price(decimal amount)

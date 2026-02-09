@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoodDelivery.Infrastructure.Persistence
+namespace FoodDelivery.Infrastructure.Persistence.Repositories
 {
     internal class UserRepository : IUserRepository
     {
