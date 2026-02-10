@@ -1,14 +1,13 @@
 ﻿using FoodDelivery.Domain.Common.Models;
-using FoodDelivery.Domain.Common.ValueObjects;
 using FoodDelivery.Domain.DinnerAggregate.ValueObjects;
-using FoodDelivery.Domain.HostAggregate.ValueObjects;
 using FoodDelivery.Domain.MenuAggregate.Entities;
 using FoodDelivery.Domain.MenuAggregate.ValueObjects;
 using FoodDelivery.Domain.MenuReview.ValueObjects;
+using FoodDelivery.Domain.UserAggregate.ValueObjects;
 
 namespace FoodDelivery.Domain.MenuAggregate
 {
-    public sealed class Menu : AggregateRoot<MenuId>
+    public sealed class Menu : AggregateRoot<MenuId,Guid>
     {
         private readonly List<MenuSection> _sections = [];
         private readonly List<MenuReviewId> _menuReviewIds = [];
@@ -20,11 +19,11 @@ namespace FoodDelivery.Domain.MenuAggregate
             MenuId id,
             string name,
             string description,
-            HostId hostId) : base(id)
+            UserId userId) : base(id)
         {
             Name = name;
             Description = description;
-            HostId = hostId;
+            UserId = userId;
             AverageRating = AverageRating.Empty();
             CreatedDateTime = DateTime.UtcNow;
             UpdatedDateTime = CreatedDateTime;
@@ -32,7 +31,7 @@ namespace FoodDelivery.Domain.MenuAggregate
 
         public string Name { get; private set; } = null!;
         public string Description { get; private set; } = null!;
-        public HostId HostId { get; private set; } = null!;
+        public UserId UserId { get; private set; } = null!;
         public AverageRating AverageRating { get; private set; } = null!;
 
         public DateTime CreatedDateTime { get; private set; }
@@ -46,18 +45,18 @@ namespace FoodDelivery.Domain.MenuAggregate
         public static Menu Create(
             string name,
             string description,
-            HostId hostId)
+            UserId userId)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Menu name is required.", nameof(name));
 
-            ArgumentNullException.ThrowIfNull(hostId);
+            ArgumentNullException.ThrowIfNull(userId);
 
             return new Menu(
                 MenuId.CreateUnique(),
                 name.Trim(),
                 description?.Trim() ?? string.Empty,
-                hostId);
+                userId);
         }
 
         // ---------- Behavior ----------

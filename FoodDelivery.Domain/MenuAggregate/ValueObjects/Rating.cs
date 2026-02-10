@@ -1,6 +1,6 @@
 ﻿using FoodDelivery.Domain.Common.Models;
 
-namespace FoodDelivery.Domain.Common.ValueObjects
+namespace FoodDelivery.Domain.MenuAggregate.ValueObjects
 {
     public sealed class Rating : ValueObject
     {

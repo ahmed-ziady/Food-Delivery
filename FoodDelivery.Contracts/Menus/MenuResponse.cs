@@ -6,7 +6,7 @@ namespace FoodDelivery.Contracts.Menus
         string Name,
         string Description,
         IReadOnlyList<MenuSectionResponse> Sections,
-        string HostId,
+        string UserId,
         double AverageRating,
         IReadOnlyList<string> DinnerIds,
         IReadOnlyList<string> MenuReviewIds,

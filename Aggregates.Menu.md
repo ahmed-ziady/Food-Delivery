@@ -39,7 +39,7 @@ void RemoveSection (Section section);
 ]",
 "createdDateTime": "2024-06-01T12:00:00Z",
 "UpdatedDateTime": "2024-06-01T12:00:00Z",
-  "hostId: "00000-0000-0000-000-000000",//something like that
+  "UserId: "00000-0000-0000-000-000000",//something like that
   "dinnerIds": [
 	"00000000-0000-0000-0000-00000000000",
 	"00000000-0000-0000-0000-00000000000"

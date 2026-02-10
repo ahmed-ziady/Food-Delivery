@@ -11,14 +11,14 @@ namespace FoodDelivery.api.Common.Mapping
         public void Register(TypeAdapterConfig config)
         {
             // Request → Command
-            config.NewConfig<(CreateMenuRequest request, string hostId), CreateMenuCommand>()
-                .Map(dest => dest.HostId, src => src.hostId)
+            config.NewConfig<(CreateMenuRequest request, string UserId), CreateMenuCommand>()
+                .Map(dest => dest.UserId, src => src.UserId)
                 .Map(dest => dest, src => src.request);
 
             // Menu → Response
             config.NewConfig<Menu, MenuResponse>()
                 .Map(dest => dest.Id, src => src.Id.Value)
-                .Map(dest => dest.HostId, src => src.HostId.Value)
+                .Map(dest => dest.UserId, src => src.UserId.Value)
                 .Map(dest => dest.AverageRating,
                     src => src.AverageRating.NumberOfRatings > 0
                         ? src.AverageRating.Value
@@ -32,7 +32,7 @@ namespace FoodDelivery.api.Common.Mapping
             // MenuSection → Response
             config.NewConfig<MenuSection, MenuSectionResponse>()
                 .Map(dest => dest.Id, src => src.Id.Value)
-                .Map(dest => dest.Items, src => src.MenuItems); // 🔥 مهم
+                .Map(dest => dest.Items, src => src.MenuItems); 
 
             // MenuItem → Response
             config.NewConfig<MenuItem, MenuItemResponse>()

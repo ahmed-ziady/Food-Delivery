@@ -13,7 +13,18 @@ namespace FoodDelivery.api.Common.Mapping
         {
             config.NewConfig<RegisterRequest, RegisterCommand>();
             config.NewConfig<LoginRequest, LoginCommand>();
-            config.NewConfig<AuthenticationResult, AuthenticationResponse>().Map(dest => dest.AccessToken, src => src.AccessToken).Map(dest => dest.RefreshToken, src => src.RefreshToken).Map(dest => dest.Id, src => src.User.Id).Map(dest => dest.FirstName, src => src.User.FirstName).Map(dest => dest.LastName, src => src.User.LastName).Map(dest => dest, src => src) .Map(dest=>dest.Email, src=>src.User.Email);
+
+            config.NewConfig<AuthenticationResult, AuthenticationResponse>()
+                .MapWith(src => new AuthenticationResponse(
+                src.User.Id.Value,
+                src.User.FirstName,
+                src.User.LastName,
+                src.User.Email.Value,
+                src.AccessToken,
+                src.RefreshToken
+            ));
+
         }
     }
+    
 }

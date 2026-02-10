@@ -1,25 +1,59 @@
 ﻿using FoodDelivery.Application.Common.Interfaces.Persistence;
-using FoodDelivery.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using FoodDelivery.Domain.UserAggregate;
+using FoodDelivery.Domain.UserAggregate.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 
-namespace FoodDelivery.Infrastructure.Persistence.Repositories
+namespace FoodDelivery.Infrastructure.Persistence.Repositories;
+
+internal sealed class UserRepository(FoodDeliveryDbContext dbContext) : IUserRepository
 {
-    internal class UserRepository : IUserRepository
+    public async Task AddAsync(
+        User user,
+        CancellationToken cancellationToken)
     {
-        private readonly static List<User> _users = [];
-        public void Add(User user)
-        {
-          _users.Add(user);
-        }
-        public User? GetUserById(Guid id)
-        {
-           return _users.SingleOrDefault(u=>u.Id == id);
-        }
-        public User? GetUserByEmail(string email)
-        {
-           return _users.SingleOrDefault(u=>u.Email == email);
-        }
+        await dbContext.Users.AddAsync(user, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task UpdateAsync(
+        User user,
+        CancellationToken cancellationToken)
+    {
+        dbContext.Users.Update(user);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<User?> GetByIdAsync(
+        UserId userId,
+        CancellationToken cancellationToken)
+    {
+        return await dbContext.Users
+            .Include(u => u.RefreshTokens)
+            .SingleOrDefaultAsync(
+                u => u.Id == userId,
+                cancellationToken);
+    }
+
+    public async Task<User?> GetByEmailAsync(
+        Email email,
+        CancellationToken cancellationToken)
+    {
+        return await dbContext.Users
+            .Include(u => u.RefreshTokens)
+            .SingleOrDefaultAsync(
+                u => u.Email == email,
+                cancellationToken);
+    }
+
+    public async Task<User?> GetByRefreshTokenAsync(
+     string refreshToken,
+     CancellationToken cancellationToken)
+    {
+        return await dbContext.Users
+            .Include(u => u.RefreshTokens)
+            .SingleOrDefaultAsync(u =>
+                u.RefreshTokens.Any(rt => rt.Token == refreshToken),
+                cancellationToken);
+    }
+
 }

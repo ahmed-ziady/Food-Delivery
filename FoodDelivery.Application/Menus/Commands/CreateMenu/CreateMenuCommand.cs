@@ -4,7 +4,7 @@ using MediatR;
 namespace FoodDelivery.Application.Menus.Commands.CreateMenu
 {
     public record CreateMenuCommand(
-        Guid HostId,
+        Guid UserId,
         string Name,
         string Description,
         IReadOnlyList<MenuSectionCommand> Sections

@@ -1,13 +1,10 @@
-﻿using FoodDelivery.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FoodDelivery.Domain.UserAggregate;
 
-namespace FoodDelivery.Application.Common.Interfaces.Authentication
+namespace FoodDelivery.Application.Common.Interfaces.Authentication;
+
+public interface IJwtTokenGenerator
 {
-    public interface IJwtTokenGenerator
-    {
-        string GenerateAccessToken(User user);
-        RefreshToken GenerateRefreshToken(Guid userId);
-    }
+    string GenerateAccessToken(User user);
+
+    string GenerateRefreshTokenValue();
 }

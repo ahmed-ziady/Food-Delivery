@@ -1,9 +1,14 @@
-﻿namespace FoodDelivery.Domain.Common.Models
+﻿namespace FoodDelivery.Domain.Common.Models;
+
+public abstract class AggregateRoot<TId, TIdType>
+    : Entity<TId>, IAggregateRootMarker
+    where TId : AggregateRootId<TIdType>
 {
-    public abstract class AggregateRoot<TId>: Entity<TId>
-        where TId : notnull
+    protected AggregateRoot() { }
+
+    protected AggregateRoot(TId id)
+        : base(id)
     {
-            protected AggregateRoot(TId id):base(id) { }
-        protected AggregateRoot() { }
     }
+
 }

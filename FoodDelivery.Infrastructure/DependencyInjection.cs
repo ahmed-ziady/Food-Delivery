@@ -29,8 +29,8 @@ namespace FoodDelivery.Infrastructure
             services.AddDbContext<FoodDeliveryDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IMenuRepository, MenuRepository>();
+            services .AddScoped<IPasswordHasher , PasswordHasher>();
             return services;
         }
         private static IServiceCollection AddAuth(this IServiceCollection services,

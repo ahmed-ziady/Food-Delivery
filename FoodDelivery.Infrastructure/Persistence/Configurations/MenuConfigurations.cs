@@ -1,7 +1,8 @@
-﻿using FoodDelivery.Domain.HostAggregate.ValueObjects;
-using FoodDelivery.Domain.MenuAggregate;
+﻿using FoodDelivery.Domain.MenuAggregate;
 using FoodDelivery.Domain.MenuAggregate.Entities;
 using FoodDelivery.Domain.MenuAggregate.ValueObjects;
+using FoodDelivery.Domain.UserAggregate;
+using FoodDelivery.Domain.UserAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -41,8 +42,8 @@ namespace FoodDelivery.Infrastructure.Persistence.Configurations
                 di.Property(d => d.Value)
                     .HasColumnName("DinnerId");
             });
-             builder.Metadata.FindNavigation(nameof(Menu.DinnerIds))!
-                .SetPropertyAccessMode(PropertyAccessMode.Field);
+            builder.Metadata.FindNavigation(nameof(Menu.DinnerIds))!
+               .SetPropertyAccessMode(PropertyAccessMode.Field);
         }
 
         private static void ConfigureMenuSectionsTable(EntityTypeBuilder<Menu> builder)
@@ -81,8 +82,11 @@ namespace FoodDelivery.Infrastructure.Persistence.Configurations
                         .HasMaxLength(400);
                     mib.OwnsOne(i => i.Price, p =>
                     {
-                        p.Property(pr => pr.Amount).HasColumnName("Price");
+                        p.Property(pr => pr.Amount)
+                            .HasColumnName("Price")
+                            .HasPrecision(18, 2); // ✅ FIX
                     });
+
                     mib.OwnsOne(s => s.AverageRating, ar =>
                     {
                         ar.Property(p => p.Value).HasColumnName("AverageRating");
@@ -91,7 +95,7 @@ namespace FoodDelivery.Infrastructure.Persistence.Configurations
 
 
                 });
-                
+
                 ms.Navigation(s => s.MenuItems)!
                     .Metadata.SetField("_menuItems");
                 ms.Navigation(s => s.MenuItems)!
@@ -117,17 +121,21 @@ namespace FoodDelivery.Infrastructure.Persistence.Configurations
             builder.Property(m => m.Description)
                 .HasMaxLength(400);
 
-            builder.OwnsOne(m => m.AverageRating , ar=>
+            builder.OwnsOne(m => m.AverageRating, ar =>
             {
                 ar.Property(p => p.Value).HasColumnName("AverageRating");
                 ar.Property(p => p.NumberOfRatings).HasColumnName("RatingCount");
             });
 
-            builder.Property(m => m.HostId)
+            builder.Property(m => m.UserId)
                 .HasConversion(
                 id => id.Value,
-                value => HostId.From(value)
+                value => UserId.From(value)
                 );
+            builder.HasOne<User>()
+                .WithMany()
+                .HasForeignKey("UserId")
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

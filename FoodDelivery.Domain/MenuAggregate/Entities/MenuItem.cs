@@ -1,5 +1,4 @@
 ﻿using FoodDelivery.Domain.Common.Models;
-using FoodDelivery.Domain.Common.ValueObjects;
 using FoodDelivery.Domain.MenuAggregate.ValueObjects;
 
 namespace FoodDelivery.Domain.MenuAggregate.Entities

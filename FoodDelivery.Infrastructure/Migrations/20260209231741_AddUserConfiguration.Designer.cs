@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodDelivery.Infrastructure.Migrations
 {
     [DbContext(typeof(FoodDeliveryDbContext))]
-    [Migration("20260209113525_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260209231741_AddUserConfiguration")]
+    partial class AddUserConfiguration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,9 +38,6 @@ namespace FoodDelivery.Infrastructure.Migrations
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)");
 
-                    b.Property<Guid>("HostId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -49,9 +46,67 @@ namespace FoodDelivery.Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("Menus", (string)null);
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.UserAggregate.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("LastLoginAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("PasswordChangedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("FoodDelivery.Domain.MenuAggregate.Menu", b =>
@@ -139,7 +194,7 @@ namespace FoodDelivery.Infrastructure.Migrations
                                     b2.WithOwner()
                                         .HasForeignKey("MenuSectionId", "MenuId");
 
-                                    b2.OwnsOne("FoodDelivery.Domain.Common.ValueObjects.AverageRating", "AverageRating", b3 =>
+                                    b2.OwnsOne("FoodDelivery.Domain.MenuAggregate.ValueObjects.AverageRating", "AverageRating", b3 =>
                                         {
                                             b3.Property<Guid>("MenuItemId")
                                                 .HasColumnType("uniqueidentifier");
@@ -178,6 +233,7 @@ namespace FoodDelivery.Infrastructure.Migrations
                                                 .HasColumnType("uniqueidentifier");
 
                                             b3.Property<decimal>("Amount")
+                                                .HasPrecision(18, 2)
                                                 .HasColumnType("decimal(18,2)")
                                                 .HasColumnName("Price");
 
@@ -199,7 +255,7 @@ namespace FoodDelivery.Infrastructure.Migrations
                             b1.Navigation("MenuItems");
                         });
 
-                    b.OwnsOne("FoodDelivery.Domain.Common.ValueObjects.AverageRating", "AverageRating", b1 =>
+                    b.OwnsOne("FoodDelivery.Domain.MenuAggregate.ValueObjects.AverageRating", "AverageRating", b1 =>
                         {
                             b1.Property<Guid>("MenuId")
                                 .HasColumnType("uniqueidentifier");
@@ -253,6 +309,73 @@ namespace FoodDelivery.Infrastructure.Migrations
                     b.Navigation("MenuReviewIds");
 
                     b.Navigation("Sections");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.UserAggregate.User", b =>
+                {
+                    b.OwnsMany("FoodDelivery.Domain.UserAggregate.Entities.RefreshToken", "RefreshTokens", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime>("CreatedAtUtc")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime>("ExpiresAtUtc")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("ReplacedByToken")
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)");
+
+                            b1.Property<DateTime?>("RevokedAtUtc")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("RevokedReason")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)");
+
+                            b1.Property<string>("Token")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)");
+
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("UserId");
+
+                            b1.ToTable("RefreshTokens", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("FoodDelivery.Domain.UserAggregate.ValueObjects.PhoneNumber", "PhoneNumber", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("nvarchar(20)")
+                                .HasColumnName("PhoneNumber");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("PhoneNumber")
+                        .IsRequired();
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

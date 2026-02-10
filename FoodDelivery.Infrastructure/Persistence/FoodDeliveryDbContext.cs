@@ -1,34 +1,43 @@
-﻿using FoodDelivery.Domain.MenuAggregate;
+﻿using FoodDelivery.Domain.Common.Models;
+using FoodDelivery.Domain.MenuAggregate;
+using FoodDelivery.Domain.UserAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace FoodDelivery.Infrastructure.Persistence
+namespace FoodDelivery.Infrastructure.Persistence;
+
+public sealed class FoodDeliveryDbContext(
+    DbContextOptions<FoodDeliveryDbContext> options) : DbContext(options)
 {
-    public class FoodDeliveryDbContext(DbContextOptions<FoodDeliveryDbContext> options) : DbContext(options)
+    public DbSet<Menu> Menus => Set<Menu>();
+    public DbSet<User> Users => Set<User>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
 
-        public DbSet<Menu> Menus { get; set; }= null!;
+        // Apply all IEntityTypeConfiguration<T>
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(FoodDeliveryDbContext).Assembly);
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        // Ensure all Aggregate Root IDs are NOT database-generated
+        DisableKeyValueGeneration(modelBuilder);
+    }
+
+    private static void DisableKeyValueGeneration(ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(FoodDeliveryDbContext).Assembly);
-            //modelBuilder.Model.GetEntityTypes().SelectMany(e=>e.GetProperties()).Where(p=>p.IsPrimaryKey()).ToList()
+            if (!typeof(IAggregateRootMarker).IsAssignableFrom(entityType.ClrType))
+                continue;
 
-            //    .ForEach(p => p.ValueGenerated = ValueGenerated.Never);
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            var key = entityType.FindPrimaryKey();
+            if (key is null)
+                continue;
+
+            foreach (var property in key.Properties)
             {
-                if (entityType.ClrType == typeof(Menu)) // add other aggregates here
-                {
-                    var key = entityType.FindPrimaryKey();
-                    if (key is not null)
-                    {
-                        foreach (var property in key.Properties)
-                        {
-                            property.ValueGenerated = ValueGenerated.Never;
-                        }
-                    }
-                }
+                property.ValueGenerated = ValueGenerated.Never;
             }
         }
     }

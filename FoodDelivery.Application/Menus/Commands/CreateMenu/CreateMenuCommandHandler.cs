@@ -1,9 +1,8 @@
 ﻿using FoodDelivery.Application.Common.Interfaces.Persistence;
-using FoodDelivery.Domain.Common.ValueObjects;
-using FoodDelivery.Domain.HostAggregate.ValueObjects;
 using FoodDelivery.Domain.MenuAggregate;
 using FoodDelivery.Domain.MenuAggregate.Entities;
 using FoodDelivery.Domain.MenuAggregate.ValueObjects;
+using FoodDelivery.Domain.UserAggregate.ValueObjects;
 using MediatR;
 
 namespace FoodDelivery.Application.Menus.Commands.CreateMenu
@@ -17,12 +16,12 @@ namespace FoodDelivery.Application.Menus.Commands.CreateMenu
         {
             await Task.CompletedTask;
 
-            var hostId = HostId.From(request.HostId);
+            var userId = UserId.From(request.UserId);
 
             var menu = Menu.Create(
-                name: request.Name,
-                description: request.Description,
-                hostId: hostId
+                request.Name,
+                 request.Description,
+                 userId
             );
 
             foreach (var sectionRequest in request.Sections)

@@ -33,7 +33,7 @@ namespace FoodDelivery.api.Controllers
 
         }
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromHeader] RefreshTokenRequest request)
+        public async Task<IActionResult> Refresh(RefreshTokenRequest request)
         {
             var command = new RefreshCommand(request.RefreshToken);
             var response = await _demdiator.Send(command);

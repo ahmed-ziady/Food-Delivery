@@ -8,8 +8,8 @@ namespace FoodDelivery.Application.Menus.Commands.CreateMenu
     {
         public CreateMenuCommandValidator()
         {
-            RuleFor(x => x.HostId)
-                .NotEmpty().WithMessage("HostId is required.");
+            RuleFor(x => x.UserId)
+                .NotEmpty().WithMessage("UserId is required.");
 
             RuleFor(x => x.Name).NotDefaultPlaceholder()
                 .NotEmpty().WithMessage("Menu name is required.")
