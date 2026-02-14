@@ -1,5 +1,9 @@
-﻿using FoodDelivery.Application.Authentication.Commands.Login;
+﻿using FoodDelivery.Application.Authentication.Commands.FacebookLogin;
+using FoodDelivery.Application.Authentication.Commands.GoogleLogin;
+using FoodDelivery.Application.Authentication.Commands.Login;
+using FoodDelivery.Application.Authentication.Commands.Refresh;
 using FoodDelivery.Application.Authentication.Commands.Register;
+using FoodDelivery.Application.Authentication.Commands.VerifyOtp;
 using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Contracts.Authentication;
 using FoodDelivery.Contracts.RefreshToken;
@@ -13,16 +17,11 @@ namespace FoodDelivery.api.Common.Mapping
         {
             config.NewConfig<RegisterRequest, RegisterCommand>();
             config.NewConfig<LoginRequest, LoginCommand>();
-
-            config.NewConfig<AuthenticationResult, AuthenticationResponse>()
-                .MapWith(src => new AuthenticationResponse(
-                src.User.Id.Value,
-                src.User.FirstName,
-                src.User.LastName,
-                src.User.Email.Value,
-                src.AccessToken,
-                src.RefreshToken
-            ));
+            config.NewConfig<VerifyEmailRequest, VerifyOtpCommand>();
+            config.NewConfig<AuthenticationResult, AuthenticationResponse>();
+            config.NewConfig<RefreshTokenRequest, RefreshCommand>();
+            config.NewConfig<GoogleLoginRequest, GoogleLoginCommand>();
+            config.NewConfig<FacebookLoginRequest, FacebookLoginCommand>();
 
         }
     }

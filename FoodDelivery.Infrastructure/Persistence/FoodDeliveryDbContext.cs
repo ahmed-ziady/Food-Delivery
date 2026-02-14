@@ -1,44 +1,25 @@
-﻿using FoodDelivery.Domain.Common.Models;
-using FoodDelivery.Domain.MenuAggregate;
-using FoodDelivery.Domain.UserAggregate;
+﻿using FoodDelivery.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace FoodDelivery.Infrastructure.Persistence;
 
 public sealed class FoodDeliveryDbContext(
-    DbContextOptions<FoodDeliveryDbContext> options) : DbContext(options)
+    DbContextOptions<FoodDeliveryDbContext> options)
+        : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options)
 {
-    public DbSet<Menu> Menus => Set<Menu>();
-    public DbSet<User> Users => Set<User>();
+
+    // Your business DbSets
+    public DbSet<Menu> Menus { get; set; }
+    public DbSet<MenuSection> MenuSections { get; set; }
+    public DbSet<MenuItem> MenuItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply all IEntityTypeConfiguration<T>
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(FoodDeliveryDbContext).Assembly);
-
-        // Ensure all Aggregate Root IDs are NOT database-generated
-        DisableKeyValueGeneration(modelBuilder);
-    }
-
-    private static void DisableKeyValueGeneration(ModelBuilder modelBuilder)
-    {
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            if (!typeof(IAggregateRootMarker).IsAssignableFrom(entityType.ClrType))
-                continue;
-
-            var key = entityType.FindPrimaryKey();
-            if (key is null)
-                continue;
-
-            foreach (var property in key.Properties)
-            {
-                property.ValueGenerated = ValueGenerated.Never;
-            }
-        }
     }
 }

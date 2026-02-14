@@ -7,6 +7,6 @@ namespace FoodDelivery.Application.Authentication.Commands.Register
         string LastName,
         string Email,
         string Password,
-        string PhoneNumber) : IRequest<AuthenticationResult>;
+        string PhoneNumber) : IRequest<Unit>;
 
 }

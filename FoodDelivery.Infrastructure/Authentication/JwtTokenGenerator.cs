@@ -1,6 +1,7 @@
 ﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
 using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
-using FoodDelivery.Domain.UserAggregate;
+using FoodDelivery.Domain.Entities;
+using FoodDelivery.Infrastructure.Authentication.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,18 +13,18 @@ namespace FoodDelivery.Infrastructure.Authentication;
 
 internal sealed class JwtTokenGenerator(
     IDateTimeProvider dateTimeProvider,
-    IOptions<JwtSettings> jwtSettings) : IJwtTokenGenerator
+    IOptions<JwtSettings> jwtSettings)
+    : IJwtTokenGenerator
 {
     private readonly JwtSettings _settings = jwtSettings.Value;
 
     public string GenerateAccessToken(User user)
     {
+
         var claims = new[]
         {
-            new Claim("sub", user.Id.Value.ToString()),
-            new Claim("email", user.Email.Value),
-            new Claim("role", user.Role.Name)
-
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
         };
 
         var signingCredentials = new SigningCredentials(

@@ -17,21 +17,20 @@ namespace FoodDelivery.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("FoodDelivery.Domain.MenuAggregate.Menu", b =>
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.Menu", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("float");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)");
 
@@ -40,8 +39,8 @@ namespace FoodDelivery.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("RatingCount")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -53,334 +52,355 @@ namespace FoodDelivery.Infrastructure.Migrations
                     b.ToTable("Menus", (string)null);
                 });
 
-            modelBuilder.Entity("FoodDelivery.Domain.UserAggregate.User", b =>
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Description")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
 
-                    b.Property<DateTime?>("DeletedAtUtc")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid>("MenuSectionId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("FirstName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("LastLoginAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("PasswordChangedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime2");
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
+                    b.HasIndex("MenuSectionId");
+
+                    b.ToTable("MenuItems", (string)null);
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuSection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<Guid>("MenuId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuId");
+
+                    b.ToTable("MenuSections", (string)null);
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("FoodDelivery.Domain.MenuAggregate.Menu", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
-                    b.HasOne("FoodDelivery.Domain.UserAggregate.User", null)
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.Menu", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
 
-                    b.OwnsMany("FoodDelivery.Domain.DinnerAggregate.ValueObjects.DinnerId", "DinnerIds", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuItem", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.MenuSection", null)
+                        .WithMany("MenuItems")
+                        .HasForeignKey("MenuSectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuSection", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.Menu", null)
+                        .WithMany("Sections")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                            b1.Property<Guid>("MenuId")
-                                .HasColumnType("uniqueidentifier");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                            b1.Property<Guid>("Value")
-                                .HasColumnType("uniqueidentifier")
-                                .HasColumnName("DinnerId");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                            b1.HasKey("Id");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                            b1.HasIndex("MenuId");
-
-                            b1.ToTable("MenuDinnerIds", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("MenuId");
-                        });
-
-                    b.OwnsMany("FoodDelivery.Domain.MenuAggregate.Entities.MenuSection", "Sections", b1 =>
-                        {
-                            b1.Property<Guid>("Id")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<Guid>("MenuId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Description")
-                                .IsRequired()
-                                .HasMaxLength(400)
-                                .HasColumnType("nvarchar(400)");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)");
-
-                            b1.HasKey("Id", "MenuId");
-
-                            b1.HasIndex("MenuId");
-
-                            b1.ToTable("MenuSections", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("MenuId");
-
-                            b1.OwnsMany("FoodDelivery.Domain.MenuAggregate.Entities.MenuItem", "MenuItems", b2 =>
-                                {
-                                    b2.Property<Guid>("Id")
-                                        .HasColumnType("uniqueidentifier")
-                                        .HasColumnName("MenuItemsId");
-
-                                    b2.Property<Guid>("MenuSectionId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("MenuId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("Description")
-                                        .IsRequired()
-                                        .HasMaxLength(400)
-                                        .HasColumnType("nvarchar(400)");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired()
-                                        .HasMaxLength(100)
-                                        .HasColumnType("nvarchar(100)");
-
-                                    b2.HasKey("Id", "MenuSectionId", "MenuId");
-
-                                    b2.HasIndex("MenuSectionId", "MenuId");
-
-                                    b2.ToTable("MenuItems", (string)null);
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("MenuSectionId", "MenuId");
-
-                                    b2.OwnsOne("FoodDelivery.Domain.MenuAggregate.ValueObjects.AverageRating", "AverageRating", b3 =>
-                                        {
-                                            b3.Property<Guid>("MenuItemId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("MenuItemMenuSectionId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("MenuItemMenuId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<int>("NumberOfRatings")
-                                                .HasColumnType("int")
-                                                .HasColumnName("RatingCount");
-
-                                            b3.Property<double>("Value")
-                                                .HasColumnType("float")
-                                                .HasColumnName("AverageRating");
-
-                                            b3.HasKey("MenuItemId", "MenuItemMenuSectionId", "MenuItemMenuId");
-
-                                            b3.ToTable("MenuItems");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("MenuItemId", "MenuItemMenuSectionId", "MenuItemMenuId");
-                                        });
-
-                                    b2.OwnsOne("FoodDelivery.Domain.MenuAggregate.ValueObjects.Price", "Price", b3 =>
-                                        {
-                                            b3.Property<Guid>("MenuItemId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("MenuItemMenuSectionId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("MenuItemMenuId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<decimal>("Amount")
-                                                .HasPrecision(18, 2)
-                                                .HasColumnType("decimal(18,2)")
-                                                .HasColumnName("Price");
-
-                                            b3.HasKey("MenuItemId", "MenuItemMenuSectionId", "MenuItemMenuId");
-
-                                            b3.ToTable("MenuItems");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("MenuItemId", "MenuItemMenuSectionId", "MenuItemMenuId");
-                                        });
-
-                                    b2.Navigation("AverageRating")
-                                        .IsRequired();
-
-                                    b2.Navigation("Price")
-                                        .IsRequired();
-                                });
-
-                            b1.Navigation("MenuItems");
-                        });
-
-                    b.OwnsOne("FoodDelivery.Domain.MenuAggregate.ValueObjects.AverageRating", "AverageRating", b1 =>
-                        {
-                            b1.Property<Guid>("MenuId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("NumberOfRatings")
-                                .HasColumnType("int")
-                                .HasColumnName("RatingCount");
-
-                            b1.Property<double>("Value")
-                                .HasColumnType("float")
-                                .HasColumnName("AverageRating");
-
-                            b1.HasKey("MenuId");
-
-                            b1.ToTable("Menus");
-
-                            b1.WithOwner()
-                                .HasForeignKey("MenuId");
-                        });
-
-                    b.OwnsMany("FoodDelivery.Domain.MenuReview.ValueObjects.MenuReviewId", "MenuReviewIds", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<Guid>("MenuId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<Guid>("Value")
-                                .HasColumnType("uniqueidentifier")
-                                .HasColumnName("ReviewId");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("MenuId");
-
-                            b1.ToTable("MenuReviewrIds", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("MenuId");
-                        });
-
-                    b.Navigation("AverageRating")
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DinnerIds");
+                    b.HasOne("FoodDelivery.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Navigation("MenuReviewIds");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.Menu", b =>
+                {
                     b.Navigation("Sections");
                 });
 
-            modelBuilder.Entity("FoodDelivery.Domain.UserAggregate.User", b =>
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuSection", b =>
                 {
-                    b.OwnsMany("FoodDelivery.Domain.UserAggregate.Entities.RefreshToken", "RefreshTokens", b1 =>
-                        {
-                            b1.Property<Guid>("Id")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<DateTime>("CreatedAtUtc")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<DateTime>("ExpiresAtUtc")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<string>("ReplacedByToken")
-                                .HasMaxLength(256)
-                                .HasColumnType("nvarchar(256)");
-
-                            b1.Property<DateTime?>("RevokedAtUtc")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<string>("RevokedReason")
-                                .HasMaxLength(200)
-                                .HasColumnType("nvarchar(200)");
-
-                            b1.Property<string>("Token")
-                                .IsRequired()
-                                .HasMaxLength(256)
-                                .HasColumnType("nvarchar(256)");
-
-                            b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("UserId");
-
-                            b1.ToTable("RefreshTokens", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.OwnsOne("FoodDelivery.Domain.UserAggregate.ValueObjects.PhoneNumber", "PhoneNumber", b1 =>
-                        {
-                            b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)")
-                                .HasColumnName("PhoneNumber");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.Navigation("PhoneNumber")
-                        .IsRequired();
-
-                    b.Navigation("RefreshTokens");
+                    b.Navigation("MenuItems");
                 });
 #pragma warning restore 612, 618
         }

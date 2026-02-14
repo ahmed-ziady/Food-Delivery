@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Domain.MenuAggregate;
+﻿using FoodDelivery.Domain.Entities;
 using MediatR;
 
 namespace FoodDelivery.Application.Menus.Commands.CreateMenu

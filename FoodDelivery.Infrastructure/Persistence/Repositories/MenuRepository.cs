@@ -1,5 +1,5 @@
 ﻿using FoodDelivery.Application.Common.Interfaces.Persistence;
-using FoodDelivery.Domain.MenuAggregate;
+using FoodDelivery.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,5 +14,7 @@ namespace FoodDelivery.Infrastructure.Persistence.Repositories
             _dbContext.Add(menu);
             _dbContext.SaveChanges();
         }
+
+      
     }
 }

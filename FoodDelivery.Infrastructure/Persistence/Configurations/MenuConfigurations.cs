@@ -1,141 +1,36 @@
-﻿using FoodDelivery.Domain.MenuAggregate;
-using FoodDelivery.Domain.MenuAggregate.Entities;
-using FoodDelivery.Domain.MenuAggregate.ValueObjects;
-using FoodDelivery.Domain.UserAggregate;
-using FoodDelivery.Domain.UserAggregate.ValueObjects;
+﻿using FoodDelivery.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace FoodDelivery.Infrastructure.Persistence.Configurations
+namespace FoodDelivery.Infrastructure.Persistence.Configurations;
+
+public sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
 {
-    public class MenuConfigurations : IEntityTypeConfiguration<Menu>
+    public void Configure(EntityTypeBuilder<Menu> builder)
     {
-        public void Configure(EntityTypeBuilder<Menu> builder)
-        {
-            ConfigureMenusTable(builder);
-            ConfigureMenuSectionsTable(builder);
-            ConfigureMenuDinnerIdsTable(builder);
-            ConfigureMenuReviewIdstable(builder);
-        }
+        builder.ToTable("Menus");
 
-        private static void ConfigureMenuReviewIdstable(EntityTypeBuilder<Menu> builder)
-        {
-            builder.OwnsMany(m => m.MenuReviewIds, di =>
-            {
-                di.ToTable("MenuReviewrIds");
-                di.WithOwner().HasForeignKey("MenuId");
-                di.HasKey("Id");
-                di.Property(d => d.Value)
-                    .HasColumnName("ReviewId");
-            });
-            builder.Metadata.FindNavigation(nameof(Menu.MenuReviewIds))!
-               .SetPropertyAccessMode(PropertyAccessMode.Field);
-        }
+        builder.HasKey(x => x.Id);
 
-        private static void ConfigureMenuDinnerIdsTable(EntityTypeBuilder<Menu> builder)
-        {
-            builder.OwnsMany(m => m.DinnerIds, di =>
-            {
-                di.ToTable("MenuDinnerIds");
-                di.WithOwner().HasForeignKey("MenuId");
-                di.HasKey("Id");
-                di.Property(d => d.Value)
-                    .HasColumnName("DinnerId");
-            });
-            builder.Metadata.FindNavigation(nameof(Menu.DinnerIds))!
-               .SetPropertyAccessMode(PropertyAccessMode.Field);
-        }
+        builder.Property(x => x.Id)
+               .ValueGeneratedNever();
 
-        private static void ConfigureMenuSectionsTable(EntityTypeBuilder<Menu> builder)
-        {
-            builder.OwnsMany(m => m.Sections, ms =>
-            {
-                ms.ToTable("MenuSections");
-                ms.WithOwner().HasForeignKey("MenuId");
-                ms.HasKey("Id", "MenuId");
-                ms.Property(s => s.Id)
-                 .HasConversion(
-                 id => id.Value,
-                 value => MenuSectionId.From(value)
-                 );
-                ms.Property(s => s.Name)
-                    .IsRequired()
-                    .HasMaxLength(100);
-                ms.Property(s => s.Description)
-                    .HasMaxLength(400);
+        builder.Property(x => x.Name)
+               .IsRequired()
+               .HasMaxLength(100);
 
-                ms.OwnsMany(s => s.MenuItems, mib =>
-                {
-                    mib.ToTable("MenuItems");
-                    mib.WithOwner().HasForeignKey("MenuSectionId", "MenuId");
-                    mib.HasKey(nameof(MenuItem.Id), "MenuSectionId", "MenuId");
-                    mib.Property(i => i.Id)
-                    .HasColumnName("MenuItemsId")
-                        .HasConversion(
-                            id => id.Value,
-                            value => MenuItemId.From(value)
-                        );
-                    mib.Property(i => i.Name)
-                        .IsRequired()
-                        .HasMaxLength(100);
-                    mib.Property(i => i.Description)
-                        .HasMaxLength(400);
-                    mib.OwnsOne(i => i.Price, p =>
-                    {
-                        p.Property(pr => pr.Amount)
-                            .HasColumnName("Price")
-                            .HasPrecision(18, 2); // ✅ FIX
-                    });
+        builder.Property(x => x.Description)
+               .HasMaxLength(400);
 
-                    mib.OwnsOne(s => s.AverageRating, ar =>
-                    {
-                        ar.Property(p => p.Value).HasColumnName("AverageRating");
-                        ar.Property(p => p.NumberOfRatings).HasColumnName("RatingCount");
-                    });
+        builder.Property(x => x.AverageRating)
+               .IsRequired();
 
+        // FK to AspNetUsers
+        builder.HasOne<User>()
+               .WithMany()
+               .HasForeignKey(x => x.UserId)
+               .OnDelete(DeleteBehavior.Restrict);
 
-                });
-
-                ms.Navigation(s => s.MenuItems)!
-                    .Metadata.SetField("_menuItems");
-                ms.Navigation(s => s.MenuItems)!
-                    .UsePropertyAccessMode(PropertyAccessMode.Field);
-            });
-            builder.Metadata.FindNavigation(nameof(Menu.Sections))!
-                .SetPropertyAccessMode(PropertyAccessMode.Field);
-
-        }
-
-        private static void ConfigureMenusTable(EntityTypeBuilder<Menu> builder)
-        {
-            builder.ToTable("Menus");
-            builder.HasKey(m => m.Id);
-            builder.Property(m => m.Id)
-                .HasConversion(
-                id => id.Value,
-                value => MenuId.From(value)
-            );
-            builder.Property(m => m.Name)
-                .IsRequired()
-                .HasMaxLength(100);
-            builder.Property(m => m.Description)
-                .HasMaxLength(400);
-
-            builder.OwnsOne(m => m.AverageRating, ar =>
-            {
-                ar.Property(p => p.Value).HasColumnName("AverageRating");
-                ar.Property(p => p.NumberOfRatings).HasColumnName("RatingCount");
-            });
-
-            builder.Property(m => m.UserId)
-                .HasConversion(
-                id => id.Value,
-                value => UserId.From(value)
-                );
-            builder.HasOne<User>()
-                .WithMany()
-                .HasForeignKey("UserId")
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+        builder.HasIndex(x => x.UserId);
     }
 }

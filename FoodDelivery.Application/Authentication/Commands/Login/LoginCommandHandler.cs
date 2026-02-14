@@ -1,64 +1,44 @@
 ﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
 using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
-using FoodDelivery.Application.Common.Interfaces.Persistence;
 using FoodDelivery.Application.Services.Authentication.Common;
-using FoodDelivery.Domain.UserAggregate.ValueObjects;
+using FoodDelivery.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace FoodDelivery.Application.Authentication.Commands.Login;
 
 public sealed class LoginCommandHandler(
-    IUserRepository userRepository,
+    UserManager<User> userManager,
     IJwtTokenGenerator jwtTokenGenerator,
-    IPasswordHasher passwordHasher,
     IDateTimeProvider dateTimeProvider)
-        : IRequestHandler<LoginCommand, AuthenticationResult>
+    : IRequestHandler<LoginCommand, AuthenticationResult>
 {
     public async Task<AuthenticationResult> Handle(
         LoginCommand command,
         CancellationToken cancellationToken)
     {
-        var email = Email.Create(command.Email);
-
-        // 🟥 401 – Invalid credentials
-        var user = await userRepository.GetByEmailAsync(
-            email,
-            cancellationToken)??throw new UnauthorizedAccessException("Invalid email or password.");
-
-        // 🔐 Verify password
-        var passwordValid = passwordHasher.Verify(
-            command.Password,
-            user.PasswordHash.Value);
+        var user = await userManager.FindByEmailAsync(command.Email)??throw new UnauthorizedAccessException("Invalid email or password.");
+        
+        var passwordValid = await userManager.CheckPasswordAsync(
+            user,
+            command.Password);
 
         if (!passwordValid)
             throw new UnauthorizedAccessException("Invalid email or password.");
 
         var now = dateTimeProvider.UtcNow;
 
-        // 🧾 Audit
-        user.RecordSuccessfulLogin(now);
+        var refreshTokenValue = jwtTokenGenerator.GenerateRefreshTokenValue();
+        var refreshTokenExpiry = now.AddMinutes(20);
 
-        // 🔁 Issue refresh token (inside aggregate)
-        var refreshTokenValue =
-            jwtTokenGenerator.GenerateRefreshTokenValue();
+        user.IssueRefreshToken(refreshTokenValue, refreshTokenExpiry);
 
-        var refreshTokenExpiry =
-            now.AddDays(7);
+        await userManager.UpdateAsync(user);
 
-        user.IssueRefreshToken(
-            refreshTokenValue,
-            refreshTokenExpiry,
-            now);
-
-        // 💾 Save aggregate
-        await userRepository.UpdateAsync(user, cancellationToken);
-
-        // 🔑 Generate access token
-        var accessToken =
-            jwtTokenGenerator.GenerateAccessToken(user);
+        var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
 
         return new AuthenticationResult(
-            user,
+            
             accessToken,
             refreshTokenValue);
     }

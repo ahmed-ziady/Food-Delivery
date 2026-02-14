@@ -25,6 +25,7 @@ public static class SwaggerExtensions
                 Name = "Authorization",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.Http,
+                BearerFormat ="JWT",
                 Scheme = "bearer"
             });
 

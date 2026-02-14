@@ -1,57 +1,50 @@
 ﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
 using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
-using FoodDelivery.Application.Common.Interfaces.Persistence;
 using FoodDelivery.Application.Services.Authentication.Common;
+using FoodDelivery.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodDelivery.Application.Authentication.Commands.Refresh;
 
 public sealed class RefreshCommandHandler(
-    IUserRepository userRepository,
+    UserManager<User> userManager,
     IJwtTokenGenerator jwtTokenGenerator,
     IDateTimeProvider dateTimeProvider)
-        : IRequestHandler<RefreshCommand, AuthenticationResult>
+    : IRequestHandler<RefreshCommand, AuthenticationResult>
 {
     public async Task<AuthenticationResult> Handle(
         RefreshCommand command,
         CancellationToken cancellationToken)
     {
         // 🔍 Find user by refresh token
-        var user = await userRepository.GetByRefreshTokenAsync(
-            command.RefreshToken,
-            cancellationToken)??throw new UnauthorizedAccessException();
+        var user = await userManager.Users
+            .FirstOrDefaultAsync(
+                u => u.RefreshToken == command.RefreshToken,
+                cancellationToken)??throw new UnauthorizedAccessException("Invalid refresh token.");
         var now = dateTimeProvider.UtcNow;
 
-        var newRefreshTokenValue =
-            jwtTokenGenerator.GenerateRefreshTokenValue();
+        // ⏳ Check expiration
+        if (user.RefreshTokenExpiry is null ||
+            user.RefreshTokenExpiry <= now)
+        {
+            throw new UnauthorizedAccessException("Refresh token expired.");
+        }
 
-        var refreshTokenExpiry =
-            now.AddMinutes(15);
+        // 🔁 Rotate refresh token
+        var newRefreshToken = jwtTokenGenerator.GenerateRefreshTokenValue();
+        var newExpiry = now.AddDays(7);
 
-        var revoked = user.RevokeRefreshToken(
-            command.RefreshToken,
-            reason: "Rotated",
-            replacedByToken: newRefreshTokenValue,
-            utcNow: now);
+        user.IssueRefreshToken(newRefreshToken, newExpiry);
 
-        if (!revoked)
-            throw new UnauthorizedAccessException();
-
-        user.IssueRefreshToken(
-            newRefreshTokenValue,
-            refreshTokenExpiry,
-            now);
-
-        // 💾 Save aggregate
-        await userRepository.UpdateAsync(user, cancellationToken);
+        await userManager.UpdateAsync(user);
 
         // 🔑 Generate new access token
-        var accessToken =
-            jwtTokenGenerator.GenerateAccessToken(user);
+        var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
 
         return new AuthenticationResult(
-            user,
             accessToken,
-            newRefreshTokenValue);
+            newRefreshToken);
     }
 }

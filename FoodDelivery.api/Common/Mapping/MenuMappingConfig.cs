@@ -1,47 +1,37 @@
 ﻿using FoodDelivery.Application.Menus.Commands.CreateMenu;
 using FoodDelivery.Contracts.Menus;
-using FoodDelivery.Domain.MenuAggregate;
+using FoodDelivery.Domain.Entities;
 using Mapster;
-using MenuSection = FoodDelivery.Domain.MenuAggregate.Entities.MenuSection;
-using MenuItem = FoodDelivery.Domain.MenuAggregate.Entities.MenuItem;
-namespace FoodDelivery.api.Common.Mapping
+using Menu = FoodDelivery.Domain.Entities.Menu;
+using MenuItem = FoodDelivery.Domain.Entities.MenuItem;
+using MenuSection = FoodDelivery.Domain.Entities.MenuSection;
+
+namespace FoodDelivery.Api.Common.Mapping;
+
+public class MenuMappingConfig : IRegister
 {
-    public class MenuMappingConfig : IRegister
+    public void Register(TypeAdapterConfig config)
     {
-        public void Register(TypeAdapterConfig config)
-        {
-            // Request → Command
-            config.NewConfig<(CreateMenuRequest request, string UserId), CreateMenuCommand>()
-                .Map(dest => dest.UserId, src => src.UserId)
-                .Map(dest => dest, src => src.request);
+        // Request → Command
+        config.NewConfig<(CreateMenuRequest request, Guid userId), CreateMenuCommand>()
+            .Map(dest => dest.UserId, src => src.userId)
+            .Map(dest => dest, src => src.request);
 
-            // Menu → Response
-            config.NewConfig<Menu, MenuResponse>()
-                .Map(dest => dest.Id, src => src.Id.Value)
-                .Map(dest => dest.UserId, src => src.UserId.Value)
-                .Map(dest => dest.AverageRating,
-                    src => src.AverageRating.NumberOfRatings > 0
-                        ? src.AverageRating.Value
-                        : 0)
-                .Map(dest => dest.DinnerIds,
-                    src => src.DinnerIds.Select(id => id.Value).ToList())
-                .Map(dest => dest.MenuReviewIds,
-                    src => src.MenuReviewIds.Select(id => id.Value).ToList())
-                .Map(dest => dest.Sections, src => src.Sections);
+        // Menu → Response
+        config.NewConfig<Menu, MenuResponse>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.UserId, src => src.UserId)
+            .Map(dest => dest.AverageRating, src => src.AverageRating)
+            .Map(dest => dest.Sections, src => src.Sections);
 
-            // MenuSection → Response
-            config.NewConfig<MenuSection, MenuSectionResponse>()
-                .Map(dest => dest.Id, src => src.Id.Value)
-                .Map(dest => dest.Items, src => src.MenuItems); 
+        // MenuSection → Response
+        config.NewConfig<MenuSection, MenuSectionResponse>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.Items, src => src.MenuItems);
 
-            // MenuItem → Response
-            config.NewConfig<MenuItem, MenuItemResponse>()
-                .Map(dest => dest.Id, src => src.Id.Value)
-                .Map(dest => dest.Price, src => src.Price.Amount)
-                .Map(dest => dest.Name, src => src.Name)
-                .Map(dest => dest.Description, src => src.Description);
-                
-        }
+        // MenuItem → Response
+        config.NewConfig<MenuItem, MenuItemResponse>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.Price, src => src.Price);
     }
-
 }

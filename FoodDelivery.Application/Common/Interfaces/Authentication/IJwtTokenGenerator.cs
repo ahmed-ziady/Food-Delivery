@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Domain.UserAggregate;
+﻿using FoodDelivery.Domain.Entities;
 
 namespace FoodDelivery.Application.Common.Interfaces.Authentication;
 

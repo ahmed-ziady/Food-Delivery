@@ -1,65 +1,55 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
-using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
-using FoodDelivery.Application.Common.Interfaces.Persistence;
-using FoodDelivery.Application.Services.Authentication.Common;
-using FoodDelivery.Domain.UserAggregate;
-using FoodDelivery.Domain.UserAggregate.ValueObjects;
+﻿using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
+using FoodDelivery.Application.Common.Interfaces.Twilio;
+using FoodDelivery.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
-namespace FoodDelivery.Application.Authentication.Commands.Register;
-
-public sealed class RegisterCommandHandler(
-    IUserRepository userRepository,
-    IJwtTokenGenerator jwtTokenGenerator,
-    IPasswordHasher passwordHasher,
-    IDateTimeProvider dateTimeProvider)
-        : IRequestHandler<RegisterCommand, AuthenticationResult>
+namespace FoodDelivery.Application.Authentication.Commands.Register
 {
-    public async Task<AuthenticationResult> Handle(
-        RegisterCommand command,
-        CancellationToken cancellationToken)
+    public sealed class RegisterCommandHandler(
+        UserManager<User> userManager,
+        IMailingService mailingService)
+                : IRequestHandler<RegisterCommand, Unit>
     {
-        var email = Email.Create(command.Email);
+        public async Task<Unit> Handle(
+            RegisterCommand command,
+            CancellationToken cancellationToken)
+        {
+            var email = command.Email.Trim().ToLower();
 
-        // 🟥 409 – Email already exists
-        var existingUser = await userRepository.GetByEmailAsync(
-            email,
-            cancellationToken);
+            var existingUser = await userManager.FindByEmailAsync(email);
 
-        if (existingUser is not null)
-            throw new InvalidOperationException("Email already exists.");
+            if (existingUser is not null)
+                throw new InvalidOperationException("Email already exists.");
 
-        // 🔐 Hash password
-        var hashedPassword = passwordHasher.Hash(command.Password);
+            var user = new User(
+                command.FirstName.Trim(),
+                command.LastName.Trim(),
+                email,
+                command.PhoneNumber.Trim()
+            );
 
-        // 👤 Create user (Domain factory)
-        var user = User.Create(
-            firstName: command.FirstName,
-            lastName: command.LastName,
-            email: email,
-            phoneNumber: PhoneNumber.Create(command.PhoneNumber),
-            passwordHash: PasswordHash.Create(hashedPassword),
-            role: UserRole.Customer,
-            utcNow: dateTimeProvider.UtcNow);
+            var result = await userManager.CreateAsync(user, command.Password);
 
-        // 🔁 Issue refresh token inside aggregate
-        var refreshTokenValue = jwtTokenGenerator.GenerateRefreshTokenValue();
-        var refreshTokenExpiry = dateTimeProvider.UtcNow.AddDays(7);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new ApplicationException(errors);
+            }
 
-        user.IssueRefreshToken(
-            refreshTokenValue,
-            refreshTokenExpiry,
-            dateTimeProvider.UtcNow);
+            // Generate OTP
+            var token = await userManager.GenerateTwoFactorTokenAsync(
+                user,
+                TokenOptions.DefaultEmailProvider);
 
-        // 💾 Save aggregate
-        await userRepository.AddAsync(user, cancellationToken);
+            // Send Email
+            await mailingService.SendEmailAsync(
+                user.Email!,
+                "Verification Code",
+                $"Your verification code is: {token}");
 
-        // 🔑 Generate access token
-        var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
 
-        return new AuthenticationResult(
-            user,
-            accessToken,
-            refreshTokenValue);
+            return Unit.Value;
+        }
     }
 }

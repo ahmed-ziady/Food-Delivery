@@ -5,11 +5,11 @@ namespace FoodDelivery.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
 
     public class TestController : ControllerBase
     {
-        [HttpGet]
+        [Authorize]
+        [HttpGet ("TestAuthorization")]
         public IActionResult Get()
         {
             return Ok("API is working!");

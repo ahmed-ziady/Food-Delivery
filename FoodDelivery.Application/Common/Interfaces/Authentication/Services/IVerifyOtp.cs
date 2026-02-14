@@ -1,0 +1,9 @@
+﻿using FoodDelivery.Application.Services.Authentication.Common;
+
+namespace FoodDelivery.Application.Common.Interfaces.Authentication.Services
+{
+    public interface IVerifyOtp
+    {
+        public Task<AuthenticationResult> VerifyOtpAsync(string email, string otp);
+    }
+}
