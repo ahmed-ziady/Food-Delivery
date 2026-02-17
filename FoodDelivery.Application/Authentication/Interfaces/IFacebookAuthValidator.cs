@@ -1,9 +1,10 @@
-﻿using FoodDelivery.Domain.Entities;
+﻿using FoodDelivery.Application.Common;
+using FoodDelivery.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoodDelivery.Application.Common.Interfaces.Authentication
+namespace FoodDelivery.Application.Authentication.Authentication
 {
     public interface IFacebookAuthValidator
     {

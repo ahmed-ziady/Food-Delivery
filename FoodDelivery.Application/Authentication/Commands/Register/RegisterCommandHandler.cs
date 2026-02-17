@@ -1,5 +1,4 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
-using FoodDelivery.Application.Common.Interfaces.Twilio;
+﻿using FoodDelivery.Application.Common.Interfaces.Twilio;
 using FoodDelivery.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;

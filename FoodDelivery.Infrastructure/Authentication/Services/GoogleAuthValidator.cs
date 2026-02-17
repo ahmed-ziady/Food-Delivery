@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
+﻿using FoodDelivery.Application.Authentication.Authentication;
 using FoodDelivery.Infrastructure.Authentication.Settings;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;

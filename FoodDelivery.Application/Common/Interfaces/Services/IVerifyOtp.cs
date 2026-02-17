@@ -1,6 +1,6 @@
 ﻿using FoodDelivery.Application.Services.Authentication.Common;
 
-namespace FoodDelivery.Application.Common.Interfaces.Authentication.Services
+namespace FoodDelivery.Application.Common.Interfaces.Services
 {
     public interface IVerifyOtp
     {

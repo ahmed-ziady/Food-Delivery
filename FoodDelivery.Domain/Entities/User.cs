@@ -6,7 +6,8 @@ public class User : IdentityUser<Guid>
 {
     public string FirstName { get; private set; } =null!;
     public string LastName { get; private set; }=null!;
-
+    public string? ProfilePictureUrl { get; private set; } 
+    public string? Bio { get; private set; } 
     public string? RefreshToken { get; private set; }
     public DateTime? RefreshTokenExpiry { get; private set; }
 
@@ -27,4 +28,21 @@ public class User : IdentityUser<Guid>
         RefreshToken = token;
         RefreshTokenExpiry = expiry;
     }
+    public void UpdateProfile(string? firstName, string? lastName, string? bio)
+    {
+        if (firstName is not null)
+            FirstName = firstName;
+
+        if (lastName is not null)
+            LastName = lastName;
+
+        if (bio is not null)
+            Bio = bio;
+    }
+    public void UpdateProfilePicture(string? profilePictureUrl)
+    {
+        if (profilePictureUrl is not null)
+            ProfilePictureUrl = profilePictureUrl;
+    }
+
 }

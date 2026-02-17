@@ -1,5 +1,5 @@
-﻿using FoodDelivery.Application.Common;
-using FoodDelivery.Application.Common.Interfaces.Authentication;
+﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Common;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Infrastructure.Authentication.Settings;
 using Microsoft.Extensions.Options;

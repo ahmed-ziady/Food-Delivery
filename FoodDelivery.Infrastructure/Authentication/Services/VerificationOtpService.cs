@@ -1,5 +1,5 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
-using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
+﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Common.Interfaces.Services;
 using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -8,8 +8,7 @@ namespace FoodDelivery.Infrastructure.Authentication.Services
 {
     public class VerificationOtpService(UserManager<User> userManager,
             IJwtTokenGenerator jwtTokenGenerator,
-    IDateTimeProvider dateTimeProvider)
- : IVerifyOtp
+    IDateTimeProvider dateTimeProvider) : IVerifyOtp
     {
         public async Task<AuthenticationResult> VerifyOtpAsync(string email, string otp)
         {
@@ -24,7 +23,7 @@ namespace FoodDelivery.Infrastructure.Authentication.Services
             var now = dateTimeProvider.UtcNow;
 
             var refreshTokenValue = jwtTokenGenerator.GenerateRefreshTokenValue();
-            var refreshTokenExpiry = now.AddDays(7);
+            var refreshTokenExpiry = now.AddMinutes(20);
 
             user.IssueRefreshToken(refreshTokenValue, refreshTokenExpiry);
 

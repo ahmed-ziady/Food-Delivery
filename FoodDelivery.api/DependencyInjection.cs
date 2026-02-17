@@ -12,8 +12,6 @@ namespace FoodDelivery.api
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerDocumentation(); 
-           
-
             return services;
         }
     }

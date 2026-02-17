@@ -1,5 +1,5 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
-using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
+﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Common.Interfaces.Services;
 using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Domain.Entities;
 using MediatR;
@@ -18,23 +18,19 @@ public sealed class RefreshCommandHandler(
         RefreshCommand command,
         CancellationToken cancellationToken)
     {
-        // 🔍 Find user by refresh token
         var user = await userManager.Users
             .FirstOrDefaultAsync(
                 u => u.RefreshToken == command.RefreshToken,
                 cancellationToken)??throw new UnauthorizedAccessException("Invalid refresh token.");
         var now = dateTimeProvider.UtcNow;
 
-        // ⏳ Check expiration
-        if (user.RefreshTokenExpiry is null ||
-            user.RefreshTokenExpiry <= now)
+        if (user.RefreshTokenExpiry <= now)
         {
             throw new UnauthorizedAccessException("Refresh token expired.");
         }
 
-        // 🔁 Rotate refresh token
         var newRefreshToken = jwtTokenGenerator.GenerateRefreshTokenValue();
-        var newExpiry = now.AddDays(7);
+        var newExpiry = now.AddMinutes(20);
 
         user.IssueRefreshToken(newRefreshToken, newExpiry);
 

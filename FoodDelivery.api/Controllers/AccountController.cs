@@ -1,31 +1,65 @@
-﻿using FoodDelivery.Contracts.Account;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using FoodDelivery.Application.Account.Commands.UpdateProfile;
+using FoodDelivery.Application.Account.Commands.UpdateProfileImage;
+using FoodDelivery.Application.Account.Queries;
+using FoodDelivery.Contracts.Account;
+using MapsterMapper;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FoodDelivery.api.Controllers
 {
+    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+
+    public class AccountController(ISender mediator, IMapper mapper) : ControllerBase
     {
+        [NonAction]
+        private Guid GetUserId()
+        {
+            var userIdClaim = User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+            return userIdClaim switch
+            {
+                null => throw new UnauthorizedAccessException("User ID claim not found."),
+                _ => Guid.Parse(userIdClaim.Value)
+            };
+        }
+
+
 
         [HttpGet]
-        public ActionResult<AccountResponse> GetAccount()
+        public async Task<ActionResult<AccountResponse>> GetAccount()
         {
-            var response = new AccountResponse(
-    "afsdkf;a",
-    "Test",
-    "Test",
-    "test@gmail.com",
-    "+201200000000",
-    "Test Bio",
-    "https://example.com/profile.jpg",
-    false,
-    false
-);
+            var userId = GetUserId();
 
-            return Ok(response);
+            var query = new GetAccountQuery(userId);
+
+            var result = await mediator.Send(query);
+
+            return Ok(result);
+        }
+
+        [HttpPatch]
+        public async Task<ActionResult<AccountResponse>> UpdateProfile(UpdateProfileRequest request)
+        {
+            var userId = GetUserId();
+            var command = mapper.Map<UpdateProfileCommand>((request, userId));
+            var result = await mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpPatch("upload-profile-image")]
+        public async Task<ActionResult<AccountResponse>> UploadProfileImage(IFormFile file)
+        {
+            var userId = GetUserId();
+            var command = new UploadProfileImageCommand(userId, file);
+            var result = await mediator.Send(command);
+            return Ok(result);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 namespace FoodDelivery.Contracts.Account
 {
     public record AccountResponse(
-       string Id,
+       Guid Id,
        string FirstName,
        string LastName,
        string Email,

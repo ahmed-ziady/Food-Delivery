@@ -1,5 +1,5 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
-using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
+﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Common.Interfaces.Services;
 using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Domain.Entities;
 using MediatR;

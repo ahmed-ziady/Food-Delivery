@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FoodDelivery.Application.Common.Interfaces.Authentication.Services
+namespace FoodDelivery.Application.Common.Interfaces.Services
 {
     public interface IDateTimeProvider
     {

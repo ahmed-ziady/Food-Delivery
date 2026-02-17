@@ -1,5 +1,5 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
-using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
+﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Common.Interfaces.Services;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Infrastructure.Authentication.Settings;
 using Microsoft.Extensions.Options;
@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace FoodDelivery.Infrastructure.Authentication;
+namespace FoodDelivery.Infrastructure.Authentication.Services;
 
 internal sealed class JwtTokenGenerator(
     IDateTimeProvider dateTimeProvider,
@@ -23,7 +23,7 @@ internal sealed class JwtTokenGenerator(
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
         };
 

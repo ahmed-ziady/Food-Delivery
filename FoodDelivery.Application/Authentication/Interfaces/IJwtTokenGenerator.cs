@@ -1,6 +1,6 @@
 ﻿using FoodDelivery.Domain.Entities;
 
-namespace FoodDelivery.Application.Common.Interfaces.Authentication;
+namespace FoodDelivery.Application.Authentication.Authentication;
 
 public interface IJwtTokenGenerator
 {

@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
+﻿using FoodDelivery.Application.Common.Interfaces.Services;
 
 namespace FoodDelivery.Infrastructure.Authentication.Services
 {

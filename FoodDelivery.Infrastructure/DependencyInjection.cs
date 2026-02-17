@@ -1,13 +1,14 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Authentication;
-using FoodDelivery.Application.Common.Interfaces.Authentication.Services;
+﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Common.Interfaces;
 using FoodDelivery.Application.Common.Interfaces.Persistence;
+using FoodDelivery.Application.Common.Interfaces.Services;
 using FoodDelivery.Application.Common.Interfaces.Twilio;
 using FoodDelivery.Domain.Entities;
-using FoodDelivery.Infrastructure.Authentication;
 using FoodDelivery.Infrastructure.Authentication.Services;
 using FoodDelivery.Infrastructure.Authentication.Settings;
 using FoodDelivery.Infrastructure.Persistence;
 using FoodDelivery.Infrastructure.Persistence.Repositories;
+using FoodDelivery.Infrastructure.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@ public static class DependencyInjection
             .AddPersistence(configuration)
             .AddAuth(configuration).
             AddIdentity();
-
+        services.AddScoped<IUserRepository, UserRepository>();  
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         //services.Configure<TwilioSettings>(configuration.GetSection(TwilioSettings.SectionName));   
         //services.AddScoped<ISmsService, TwilioSmsService>();
@@ -40,7 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IGoogleAuthValidator, GoogleAuthValidator>();
         services.AddHttpClient();
         services.AddTransient<IMailingService, EmailService>();
-
+        services.AddScoped<IImageStorageService, LocalImageStorageService>();
         return services;
     }
 
