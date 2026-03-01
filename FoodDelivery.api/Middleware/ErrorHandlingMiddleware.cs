@@ -5,38 +5,26 @@ using FoodDelivery.Application.Common.Exceptions;
 
 namespace FoodDelivery.Api.Middleware;
 
-public sealed class ErrorHandlingMiddleware
+public sealed class ErrorHandlingMiddleware(
+    RequestDelegate next,
+    ILogger<ErrorHandlingMiddleware> logger,
+    IWebHostEnvironment env)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<ErrorHandlingMiddleware> _logger;
-    private readonly IWebHostEnvironment _env;
-
-    public ErrorHandlingMiddleware(
-        RequestDelegate next,
-        ILogger<ErrorHandlingMiddleware> logger,
-        IWebHostEnvironment env)
-    {
-        _next = next;
-        _logger = logger;
-        _env = env;
-    }
-
     public async Task InvokeAsync(HttpContext context)
     {
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
         {
-            // Client closed the request. (499 is common but non-standard)
             context.Response.StatusCode = 499;
         }
         catch (Exception ex)
         {
             if (context.Response.HasStarted)
             {
-                _logger.LogError(ex, "Response already started. TraceId: {TraceId}", context.TraceIdentifier);
+                logger.LogError(ex, "Response already started. TraceId: {TraceId}", context.TraceIdentifier);
                 throw;
             }
 
@@ -50,7 +38,7 @@ public sealed class ErrorHandlingMiddleware
 
         var (status, title, type, code, errors, retryAfterSeconds) = Map(ex);
 
-        _logger.LogError(ex, "Exception mapped to {Status}. Code={Code}. TraceId={TraceId}", status, code, traceId);
+        logger.LogError(ex, "Exception mapped to {Status}. Code={Code}. TraceId={TraceId}", status, code, traceId);
 
         context.Response.Clear();
         context.Response.StatusCode = status;
@@ -71,7 +59,7 @@ public sealed class ErrorHandlingMiddleware
                 Title = "Validation failed",
                 Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.1",
                 Instance = context.Request.Path,
-                Detail = _env.IsDevelopment() ? "One or more validation errors occurred." : null
+                Detail = env.IsDevelopment() ? "One or more validation errors occurred." : null
             };
 
             vpd.Extensions["traceId"] = traceId;
@@ -87,7 +75,7 @@ public sealed class ErrorHandlingMiddleware
             Title = title,
             Type = type,
             Instance = context.Request.Path,
-            Detail = _env.IsDevelopment() ? ex.Message : "An error occurred while processing your request."
+            Detail = env.IsDevelopment() ? ex.Message : "An error occurred while processing your request."
         };
 
         pd.Extensions["traceId"] = traceId;
@@ -98,7 +86,7 @@ public sealed class ErrorHandlingMiddleware
         if (errors is not null)
             pd.Extensions["errors"] = errors;
 
-        if (_env.IsDevelopment())
+        if (env.IsDevelopment())
             pd.Extensions["exception"] = ex.GetType().FullName;
 
         await context.Response.WriteAsJsonAsync(pd);

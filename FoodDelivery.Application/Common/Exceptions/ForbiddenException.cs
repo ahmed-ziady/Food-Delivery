@@ -1,7 +1,6 @@
 ﻿namespace FoodDelivery.Application.Common.Exceptions
 {
-    public sealed class ForbiddenException : AppException
+    public sealed class ForbiddenException(string code, string message) : AppException(code, message)
     {
-        public ForbiddenException(string code, string message) : base(code, message) { }
     }
 }

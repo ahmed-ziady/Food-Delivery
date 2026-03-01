@@ -1,4 +1,5 @@
 ﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Common.Interfaces.Persistence;
 using FoodDelivery.Application.Common.Interfaces.Services;
 using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Domain.Entities;
@@ -9,6 +10,7 @@ namespace FoodDelivery.Application.Authentication.Commands.Login;
 
 public sealed class LoginCommandHandler(
     UserManager<User> userManager,
+    IMenuRepository menuRepository,
     IJwtTokenGenerator jwtTokenGenerator,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<LoginCommand, AuthenticationResult>
@@ -37,7 +39,21 @@ public sealed class LoginCommandHandler(
         await userManager.UpdateAsync(user);
 
         var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
-
+        if (menuRepository.GetByRestaurantIdAsync(user.Id, cancellationToken).Result is not null)
+        {
+            return new AuthenticationResult(
+                accessToken,
+                refreshTokenValue);
+        }
+       var menu = new Menu
+        (
+           Guid.NewGuid(),
+            $"{user.FirstName}'s Menu",
+               user.Id
+       );
+        
+        await menuRepository.AddAsync(menu , cancellationToken);
+        await menuRepository.SaveChangesAsync(cancellationToken);
         return new AuthenticationResult(
             
             accessToken,

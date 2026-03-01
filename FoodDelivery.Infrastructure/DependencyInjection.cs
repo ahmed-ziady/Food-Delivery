@@ -31,6 +31,7 @@ public static class DependencyInjection
             .AddAuth(configuration).
             AddIdentity();
         services.AddScoped<IUserRepository, UserRepository>();  
+        services.AddScoped<IMenuRepository , MenuRepository>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         //services.Configure<TwilioSettings>(configuration.GetSection(TwilioSettings.SectionName));   
         //services.AddScoped<ISmsService, TwilioSmsService>();
@@ -42,6 +43,9 @@ public static class DependencyInjection
         services.AddHttpClient();
         services.AddTransient<IMailingService, EmailService>();
         services.AddScoped<IImageStorageService, LocalImageStorageService>();
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromMinutes(10));
+
         return services;
     }
 

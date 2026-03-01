@@ -8,7 +8,7 @@ namespace FoodDelivery.api.Common.Mapping
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddMappings(this IServiceCollection services) 
+        public static IServiceCollection AddPresentationMappings(this IServiceCollection services) 
         {
         
 

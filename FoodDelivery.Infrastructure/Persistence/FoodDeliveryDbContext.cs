@@ -12,8 +12,8 @@ public sealed class FoodDeliveryDbContext(
 
     // Your business DbSets
     public DbSet<Menu> Menus { get; set; }
-    public DbSet<MenuSection> MenuSections { get; set; }
-    public DbSet<MenuItem> MenuItems { get; set; }
+    public DbSet<MenuSection> MenuSections => Set<MenuSection>();
+    public DbSet<MenuItem> MenuItems => Set<MenuItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

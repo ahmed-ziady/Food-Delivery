@@ -45,4 +45,10 @@ public class User : IdentityUser<Guid>
             ProfilePictureUrl = profilePictureUrl;
     }
 
+    public void RevokeRefreshToken()
+    {
+        RefreshToken = null;
+        RefreshTokenExpiry = null;
+    }
+
 }

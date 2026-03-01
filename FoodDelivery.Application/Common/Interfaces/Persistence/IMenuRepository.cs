@@ -7,7 +7,10 @@ namespace FoodDelivery.Application.Common.Interfaces.Persistence
 {
     public interface IMenuRepository
     {
-        void Add(Menu menu);
-
+        Task<Menu?> GetByIdAsync(Guid Id, CancellationToken cancellationToken);
+        Task<Menu?> GetByRestaurantIdAsync(Guid RestaurantId, CancellationToken cancellationToken);
+        Task AddAsync(Menu menu , CancellationToken cancellationToken);
+        Task UpdateAsync(Menu menu, CancellationToken cancellationToken);
+        Task SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

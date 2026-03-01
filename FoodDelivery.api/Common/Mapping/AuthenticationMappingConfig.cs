@@ -3,6 +3,8 @@ using FoodDelivery.Application.Authentication.Commands.GoogleLogin;
 using FoodDelivery.Application.Authentication.Commands.Login;
 using FoodDelivery.Application.Authentication.Commands.Refresh;
 using FoodDelivery.Application.Authentication.Commands.Register;
+using FoodDelivery.Application.Authentication.Commands.ResendVerificationCode;
+using FoodDelivery.Application.Authentication.Commands.ResetPassword;
 using FoodDelivery.Application.Authentication.Commands.VerifyOtp;
 using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Contracts.Authentication;
@@ -22,6 +24,8 @@ namespace FoodDelivery.api.Common.Mapping
             config.NewConfig<RefreshTokenRequest, RefreshCommand>();
             config.NewConfig<GoogleLoginRequest, GoogleLoginCommand>();
             config.NewConfig<FacebookLoginRequest, FacebookLoginCommand>();
+            config.NewConfig<ResendVerificatonCodeRequest, ResendVerificationCodeCommand>();
+            config.NewConfig<ResetPasswordRequest, ResetPasswordCommand>();
 
         }
     }

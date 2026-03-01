@@ -1,40 +1,51 @@
-﻿namespace FoodDelivery.Domain.Entities
+﻿using FoodDelivery.Domain.Commons;
+using static System.Collections.Specialized.BitVector32;
+
+namespace FoodDelivery.Domain.Entities
 {
     public class Menu
     {
         public Guid Id { get; private set; }
+        public string Name { get; private set; } = null!;
+        public Guid RestaurantId { get; private set; }
 
-        public string Name { get; private set; }
-        public string? Description { get; private set; }
+        private readonly List<MenuSection> _sections = [];
+        public IReadOnlyCollection<MenuSection> Sections => _sections.AsReadOnly();
 
-        public Guid UserId { get; private set; }  // Identity user
+        private Menu() { } // EF
 
-        public double AverageRating { get; private set; }
-        public int RatingCount { get; private set; }
-
-        public List<MenuSection> Sections { get; private set; } = [];
-
-        private Menu() { } // For EF
-
-        public Menu(string name, string? description, Guid userId)
+        public Menu(Guid id, string name, Guid restaurantId)
         {
-            Id = Guid.NewGuid();
+            Id = id;
+            SetName(name);
+            RestaurantId = restaurantId;
+        }
+
+        public void SetName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new DomainException("Menu name cannot be empty.");
             Name = name;
-            Description = description;
-            UserId = userId;
-            AverageRating = 0;
-            RatingCount = 0;
         }
 
-        public void AddSection(string name, string? description)
+        public void AddSection(MenuSection section)
         {
-            Sections.Add(new MenuSection(name, description));
+            if (_sections.Any(s => s.Name.Equals(section.Name, StringComparison.OrdinalIgnoreCase)))
+                throw new DomainException($"Section '{section.Name}' already exists.");
+            _sections.Add(section);
         }
-
-        public void UpdateRating(double newRating)
+        public void UpdateSectionName(Guid sectionId, string name)
         {
-            RatingCount++;
-            AverageRating = ((AverageRating * (RatingCount - 1)) + newRating) / RatingCount;
+            var section = Sections.FirstOrDefault(s => s.Id == sectionId)??throw new DomainException("Menu section not found.");
+            if(Sections.Any(s => s.Id != sectionId && s.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                throw new DomainException($"Another menu section with name '{name}' already exists.");
+            section.SetName(name);
         }
+        public void RemoveSection(Guid sectionId)
+        {
+            var section = Sections.FirstOrDefault(s => s.Id == sectionId)??throw new DomainException("Menu section not found.");
+            _sections.Remove(section);
+        }
+        public MenuSection? GetSection(Guid sectionId)=> Sections.FirstOrDefault(s => s.Id == sectionId);
     }
 }

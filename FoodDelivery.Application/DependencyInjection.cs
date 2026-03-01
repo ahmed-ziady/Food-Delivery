@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FoodDelivery.Application.Common;
 using FoodDelivery.Application.Common.Behaviors;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,7 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(
             Assembly.GetExecutingAssembly());
-
+        services.AddMappings();
         return services;
     }
 }

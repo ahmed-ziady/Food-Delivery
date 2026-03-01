@@ -1,8 +1,11 @@
 ﻿using FoodDelivery.Application.Authentication.Commands.FacebookLogin;
+using FoodDelivery.Application.Authentication.Commands.ForgotPassword;
 using FoodDelivery.Application.Authentication.Commands.GoogleLogin;
 using FoodDelivery.Application.Authentication.Commands.Login;
 using FoodDelivery.Application.Authentication.Commands.Refresh;
 using FoodDelivery.Application.Authentication.Commands.Register;
+using FoodDelivery.Application.Authentication.Commands.ResendVerificationCode;
+using FoodDelivery.Application.Authentication.Commands.ResetPassword;
 using FoodDelivery.Application.Authentication.Commands.VerifyOtp;
 using FoodDelivery.Contracts.Authentication;
 using FoodDelivery.Contracts.RefreshToken;
@@ -17,7 +20,7 @@ namespace FoodDelivery.api.Controllers
     public class AuthenticationController(ISender _demdiator, IMapper _mapper) : ControllerBase
     {
         [HttpPost("register")]
-        public async Task<IActionResult> Register(Contracts.Authentication.RegisterRequest request)
+        public async Task<IActionResult> Register(RegisterRequest request)
         {
             var command = _mapper.Map<RegisterCommand>(request);
             await _demdiator.Send(command);
@@ -29,9 +32,23 @@ namespace FoodDelivery.api.Controllers
 
             });
         }
+        [HttpPost("resend-v-code")]
+        public async Task<IActionResult> ResendVerificationCode(
+     ResendVerificatonCodeRequest request)
+        {
+            var command = _mapper.Map<ResendVerificationCodeCommand>(request);
+
+            await _demdiator.Send(command);
+
+            return Accepted(new
+            {
+                Message = "If the email exists, a verification code has been sent."
+            });
+        }
+
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(Contracts.Authentication.LoginRequest request)
+        public async Task<IActionResult> Login(LoginRequest request)
         {
             var command = _mapper.Map<LoginCommand>(request);
             var response = await _demdiator.Send(command);
@@ -73,6 +90,24 @@ namespace FoodDelivery.api.Controllers
             var response = await _demdiator.Send(command);
             var authResponse = _mapper.Map<AuthenticationResponse>(response);
             return Ok(authResponse);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPasswordAsync(ForgotPasswordRequest request)
+        {
+            var command = _mapper.Map<ForgotPasswordCommand>(request);
+            await _demdiator.Send(command);
+            return Accepted(new { Message = "Please check your email to verify your email." });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequest request)
+        {
+            var command = _mapper.Map<ResetPasswordCommand>(request);
+            await _demdiator.Send(command);
+            return Accepted(new { Message = "Password reset successful. You can now log in with your new password." });
+
+
         }
     }
 }

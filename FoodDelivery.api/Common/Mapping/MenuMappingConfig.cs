@@ -1,37 +1,19 @@
-﻿using FoodDelivery.Application.Menus.Commands.CreateMenu;
+﻿using FoodDelivery.Application.Menus.Commands.Sections.AddSection;
+using FoodDelivery.Application.Menus.Commands.Sections.UpdateSectionName;
 using FoodDelivery.Contracts.Menus;
-using FoodDelivery.Domain.Entities;
 using Mapster;
-using Menu = FoodDelivery.Domain.Entities.Menu;
-using MenuItem = FoodDelivery.Domain.Entities.MenuItem;
-using MenuSection = FoodDelivery.Domain.Entities.MenuSection;
 
-namespace FoodDelivery.Api.Common.Mapping;
-
-public class MenuMappingConfig : IRegister
+namespace FoodDelivery.Api.Common.Mapping
 {
-    public void Register(TypeAdapterConfig config)
+    public class MenuMappingConfig : IRegister
     {
-        // Request → Command
-        config.NewConfig<(CreateMenuRequest request, Guid userId), CreateMenuCommand>()
-            .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
-
-        // Menu → Response
-        config.NewConfig<Menu, MenuResponse>()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.UserId, src => src.UserId)
-            .Map(dest => dest.AverageRating, src => src.AverageRating)
-            .Map(dest => dest.Sections, src => src.Sections);
-
-        // MenuSection → Response
-        config.NewConfig<MenuSection, MenuSectionResponse>()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.Items, src => src.MenuItems);
-
-        // MenuItem → Response
-        config.NewConfig<MenuItem, MenuItemResponse>()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.Price, src => src.Price);
+        public void Register(TypeAdapterConfig config)
+        {
+            config.NewConfig<(AddMenuSectionRequest request, Guid restaurantId), AddMenuSectionCommand>()
+                .Map(dest => dest.OwenerId, src => src.restaurantId)
+                .Map(dest => dest, src => src.request);
+        }
     }
+  
+
 }

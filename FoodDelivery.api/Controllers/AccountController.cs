@@ -1,4 +1,7 @@
-﻿using FoodDelivery.Application.Account.Commands.UpdateProfile;
+﻿using FoodDelivery.Application.Account.Commands.ChangeEmail.ChangeEmailConfirm;
+using FoodDelivery.Application.Account.Commands.ChangeEmail.ChangeEmailRequest;
+using FoodDelivery.Application.Account.Commands.Logout;
+using FoodDelivery.Application.Account.Commands.UpdateProfile;
 using FoodDelivery.Application.Account.Commands.UpdateProfileImage;
 using FoodDelivery.Application.Account.Queries;
 using FoodDelivery.Contracts.Account;
@@ -60,6 +63,34 @@ namespace FoodDelivery.api.Controllers
             var command = new UploadProfileImageCommand(userId, file);
             var result = await mediator.Send(command);
             return Ok(result);
+        }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = GetUserId();
+            var command = new LogoutCommand(userId);
+            await mediator.Send(command);
+            return NoContent();
+        }
+
+        [HttpPost("change-email")]
+        public async  Task<IActionResult> ChangeEmailAsync()
+        {
+            var userId = GetUserId();
+            var command = new ChangeEmailCommand(userId);
+            await mediator.Send(command);
+            return Accepted(new { Message = "Please check your email to verify your email." });
+        }
+
+        [HttpPost("confirm-email-change")]
+        public async Task<IActionResult> ConfirmEmailChange( ChangeEmailRequest request)
+        {
+            var userId = GetUserId();
+            var command = mapper.Map<ChangeEmailConfirmCommand>((request, userId));
+            var result = await mediator.Send(command);
+            var response = mapper.Map<AccountResponse>(result);
+            return Ok(response);
+
         }
     }
 }

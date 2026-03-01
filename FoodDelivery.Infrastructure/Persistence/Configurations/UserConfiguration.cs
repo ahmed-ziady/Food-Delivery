@@ -15,6 +15,9 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.ToTable("Users");
 
-  
+        builder.HasOne<Menu>()
+                 .WithOne()           //
+                 .HasForeignKey<Menu>(m => m.RestaurantId)
+                 .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -27,4 +27,9 @@
     <ProjectReference Include="..\FoodDelivery.Infrastructure\FoodDelivery.Infrastructure.csproj" />
   </ItemGroup>
 
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\uploads\profile\" />
+	</ItemGroup>
+
 </Project>
