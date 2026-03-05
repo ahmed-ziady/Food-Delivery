@@ -18,13 +18,14 @@ namespace FoodDelivery.Application.Account.Commands.UpdateProfileImage
                 "Account.NotFound",
                 "Account not found.");
 
-            var newImageUrl = await imageStorageService.UploadAsync(request.File, cancellationToken);
+            var newImageUrl = await imageStorageService.UploadAsync(request.File, "profile", cancellationToken);
             try
             {
                 if (!string.IsNullOrWhiteSpace(user.ProfilePictureUrl))
                 {
                     await imageStorageService.DeleteAsync(
                         user.ProfilePictureUrl,
+                        "profile",
                         cancellationToken);
                 }
 
@@ -37,6 +38,7 @@ namespace FoodDelivery.Application.Account.Commands.UpdateProfileImage
             {
                 await imageStorageService.DeleteAsync(
                     newImageUrl,
+                    "profile",
                     cancellationToken);
 
                 throw;

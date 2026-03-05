@@ -9,8 +9,7 @@ namespace FoodDelivery.Application.Common.Interfaces.Persistence
     {
         Task<Menu?> GetByIdAsync(Guid Id, CancellationToken cancellationToken);
         Task<Menu?> GetByRestaurantIdAsync(Guid RestaurantId, CancellationToken cancellationToken);
-        Task AddAsync(Menu menu , CancellationToken cancellationToken);
-        Task UpdateAsync(Menu menu, CancellationToken cancellationToken);
+        Task AddAsync(  Menu menu , CancellationToken cancellationToken);
         Task SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

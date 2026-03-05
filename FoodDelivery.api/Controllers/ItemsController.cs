@@ -1,15 +1,19 @@
 ﻿using FoodDelivery.Application.Menus.Commands.Items.AddItem;
+using FoodDelivery.Application.Menus.Commands.Items.AddItemPictures;
 using FoodDelivery.Application.Menus.Commands.Items.DeleteItem;
-using FoodDelivery.Application.Menus.Commands.Items.UpdateItem;
-using FoodDelivery.Application.Menus.Queries.Items;
-using FoodDelivery.Contracts.Menus;
+using FoodDelivery.Application.Menus.Commands.Items.DeleteItemPicture;
+using FoodDelivery.Application.Sections.Commands.Items.AddIngredientsToItem;
+using FoodDelivery.Application.Sections.Commands.Items.UpdateItem;
+using FoodDelivery.Application.Sections.Commands.Items.UpdateItemIngredients;
+using FoodDelivery.Application.Sections.Queries.Items;
+using FoodDelivery.Contracts.Sections;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace FoodDelivery.api.Controllers
 {
-    [Route("api/menus/sections/{sectionId}/items")]
+    [Route("api/sections/{sectionId}/items")]
     [ApiController]
     public class ItemsController(ISender mediator) : ControllerBase
     {
@@ -34,13 +38,12 @@ namespace FoodDelivery.api.Controllers
             return Ok(items);
         }
 
-        [HttpGet("{itemId}")]
+        [HttpGet("{itemId}", Name = "GetSectionItem")]
         public async Task<IActionResult> GetAsync(Guid sectionId, Guid itemId)
         {
             var restaurantId = GetRestaurantId();
             var query = new GetItemQuery(restaurantId, sectionId, itemId);
             var item = await mediator.Send(query);
-
             return Ok(item);
         }
 
@@ -53,11 +56,13 @@ namespace FoodDelivery.api.Controllers
                 sectionId,
                 request.Name,
                 request.Description,
-                request.Price
+                request.Price,
+                request.DeliveryType
             );
 
             var item = await mediator.Send(command);
-            return CreatedAtAction(nameof(GetAsync), new { sectionId, itemId = item.Id }, item);
+
+            return CreatedAtRoute("GetSectionItem", new { sectionId, itemId = item.Id }, item);
         }
 
         [HttpPatch("{itemId}")]
@@ -86,5 +91,41 @@ namespace FoodDelivery.api.Controllers
             await mediator.Send(command);
             return NoContent();
         }
+        [HttpPost("{itemId}/pictures")]
+        public async Task<IActionResult> UploadAsync(Guid sectionId, Guid itemId, IFormFileCollection formFiles)
+
+        {
+            var restaurantId = GetRestaurantId();
+            var command = new AddItemPicturesCommand(restaurantId, sectionId, itemId, formFiles);
+            await mediator.Send(command);
+            return NoContent();
+        }
+        [HttpDelete("{itemId}/pictures")]
+        public async Task<IActionResult> DeleteAsync(Guid sectionId, Guid itemId, [FromQuery] string url)
+        {
+            var restaurantId = GetRestaurantId();
+
+            if (string.IsNullOrWhiteSpace(url))
+                return BadRequest("Picture URL is required.");
+            var command = new DeleteItemPictureCommand(restaurantId, sectionId, itemId, url);
+            await mediator.Send(command);
+
+            return NoContent();
+        }
+        [HttpPost("{itemId}/ingredients")]
+        public async Task<IActionResult> AddAsync(Guid sectionId, Guid itemId, AddIngredientsToITemRequest request)
+        {
+            var restuarantId = GetRestaurantId();
+            await mediator.Send(new AddIngredientsToItemCommand(restuarantId, sectionId, itemId, request.IngredientIds));
+            return NoContent();
+        }
+        [HttpPut("{itemId}/ingredients")]
+        public async Task<IActionResult> UpdateAsync(Guid restuarantId, Guid sectionId, Guid itemId, UpdateItemIngredientsRequest request)
+        {
+            await mediator.Send(new UpdateItemIngredientsCommand(restuarantId, sectionId, itemId, request.IngredientIds));
+            return NoContent();
+        }
     }
+
+
 }

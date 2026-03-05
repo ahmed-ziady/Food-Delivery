@@ -12,14 +12,15 @@ public sealed class FoodDeliveryDbContext(
 
     // Your business DbSets
     public DbSet<Menu> Menus { get; set; }
-    public DbSet<MenuSection> MenuSections => Set<MenuSection>();
-    public DbSet<MenuItem> MenuItems => Set<MenuItem>();
-
+    public DbSet<Ingredient> Ingredients => Set<Ingredient>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(FoodDeliveryDbContext).Assembly);
+
+
     }
 }

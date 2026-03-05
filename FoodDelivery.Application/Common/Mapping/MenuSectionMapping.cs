@@ -1,26 +1,35 @@
-﻿using FoodDelivery.Application.Menus.Common;
+﻿using FoodDelivery.Application.Sections.Common;
 using FoodDelivery.Domain.Entities;
+using FoodDelivery.Domain.ValueObjects;
 using Mapster;
-using MapsterMapper;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FoodDelivery.Application.Common.Mapping
 {
-    public static class MenuMappingConfig
+    public class MenuMappingConfig : IRegister
     {
-        public static void RegisterMappings()
+        public void Register(TypeAdapterConfig config)
         {
-            TypeAdapterConfig<MenuItem, MenuItemDto>.NewConfig()
-                .Map(dest => dest.Ingredients, src => src.Ingredients)
-                .Map(dest => dest.Pictures, src => src.Pictures);
+            config.NewConfig<MenuItem, MenuItemDto>()
+                .Map(dest => dest.Ingredients,
+                     src => src.MenuItemIngredients
+                               .Select(mii => new IngredientDto(
+                                   mii.Ingredient.Id,
+                                   mii.Ingredient.Name,
+                                   mii.Ingredient.ImageUrl,
+                                   mii.Ingredient.Type)))
+                .Map(dest => dest.Pictures,
+                     src => src.Pictures
+                               .Select(p => new PictureDto(p.Url)));
 
-            TypeAdapterConfig<MenuSection, MenuSectionDto>.NewConfig()
-                .Map(dest => dest.Items, src => src.Items);
-
-            TypeAdapterConfig<MenuSection, MenuSectionDto>.NewConfig()
+            config.NewConfig<MenuSection, MenuSectionDto>()
+                .Map(dest => dest.Items,
+                     src => src.Items.Select(i => i.Adapt<MenuItemDto>()))
                 .IgnoreNullValues(true);
+
+            config.NewConfig<Ingredient, IngredientDto>();
+
+            // Picture -> PictureDto
+            config.NewConfig<Picture, PictureDto>();
         }
     }
 }

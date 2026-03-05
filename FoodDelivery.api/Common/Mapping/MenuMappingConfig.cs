@@ -1,6 +1,7 @@
-﻿using FoodDelivery.Application.Menus.Commands.Sections.AddSection;
+﻿using FoodDelivery.Application.Ingredients.Commands.AddIngredients;
 using FoodDelivery.Application.Menus.Commands.Sections.UpdateSectionName;
-using FoodDelivery.Contracts.Menus;
+using FoodDelivery.Application.Sections.Commands.Sections.AddSection;
+using FoodDelivery.Contracts.Sections;
 using Mapster;
 
 namespace FoodDelivery.Api.Common.Mapping
@@ -10,8 +11,11 @@ namespace FoodDelivery.Api.Common.Mapping
         public void Register(TypeAdapterConfig config)
         {
             config.NewConfig<(AddMenuSectionRequest request, Guid restaurantId), AddMenuSectionCommand>()
-                .Map(dest => dest.OwenerId, src => src.restaurantId)
+                .Map(dest => dest.RestuarantId, src => src.restaurantId)
                 .Map(dest => dest, src => src.request);
+
+
+
         }
     }
   

@@ -6,7 +6,9 @@ namespace FoodDelivery.Domain.Enums
 {
     public enum IngredientType
     {
-        Basic,
-        Fruit
+        Vegetable = 0,   
+        Protein = 1,     
+        Cheese = 2,      
+        Sauce = 3        
     }
 }

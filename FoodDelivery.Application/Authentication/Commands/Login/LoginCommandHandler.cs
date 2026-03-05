@@ -52,7 +52,7 @@ public sealed class LoginCommandHandler(
                user.Id
        );
         
-        await menuRepository.AddAsync(menu , cancellationToken);
+        await menuRepository.AddAsync(  menu , cancellationToken);
         await menuRepository.SaveChangesAsync(cancellationToken);
         return new AuthenticationResult(
             

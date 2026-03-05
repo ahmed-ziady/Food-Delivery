@@ -6,10 +6,12 @@ namespace FoodDelivery.Application.Common.Interfaces
     {
         Task<string> UploadAsync(
             IFormFile file,
+            string folderName,
             CancellationToken cancellationToken);
 
         Task DeleteAsync(
             string imageUrl,
+            string folderName,
             CancellationToken cancellationToken);
     }
 

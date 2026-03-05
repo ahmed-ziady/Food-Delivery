@@ -32,6 +32,7 @@ public static class DependencyInjection
             AddIdentity();
         services.AddScoped<IUserRepository, UserRepository>();  
         services.AddScoped<IMenuRepository , MenuRepository>();
+        services.AddScoped<IIngredientRepository, IngredientRepository>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         //services.Configure<TwilioSettings>(configuration.GetSection(TwilioSettings.SectionName));   
         //services.AddScoped<ISmsService, TwilioSmsService>();

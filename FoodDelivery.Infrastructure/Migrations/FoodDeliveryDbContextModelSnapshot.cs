@@ -22,6 +22,29 @@ namespace FoodDelivery.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.Ingredient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ingredients", (string)null);
+                });
+
             modelBuilder.Entity("FoodDelivery.Domain.Entities.Menu", b =>
                 {
                     b.Property<Guid>("Id")
@@ -43,6 +66,71 @@ namespace FoodDelivery.Infrastructure.Migrations
                     b.ToTable("Menus", (string)null);
                 });
 
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("DeliveryType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("MenuSectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuSectionId");
+
+                    b.ToTable("MenuItems", (string)null);
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuItemIngredient", b =>
+                {
+                    b.Property<Guid>("MenuItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("MenuItemId", "IngredientId");
+
+                    b.HasIndex("IngredientId");
+
+                    b.ToTable("MenuItemIngredients", (string)null);
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuSection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MenuId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuId");
+
+                    b.ToTable("MenuSections", (string)null);
+                });
+
             modelBuilder.Entity("FoodDelivery.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -60,6 +148,7 @@ namespace FoodDelivery.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -92,7 +181,8 @@ namespace FoodDelivery.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
@@ -113,6 +203,7 @@ namespace FoodDelivery.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -262,116 +353,73 @@ namespace FoodDelivery.Infrastructure.Migrations
 
             modelBuilder.Entity("FoodDelivery.Domain.Entities.Menu", b =>
                 {
-                    b.HasOne("FoodDelivery.Domain.Entities.User", null)
-                        .WithOne()
+                    b.HasOne("FoodDelivery.Domain.Entities.User", "Restaurant")
+                        .WithOne("Menu")
                         .HasForeignKey("FoodDelivery.Domain.Entities.Menu", "RestaurantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsMany("FoodDelivery.Domain.Entities.MenuSection", "_sections", b1 =>
+                    b.Navigation("Restaurant");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuItem", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.MenuSection", "MenuSection")
+                        .WithMany("Items")
+                        .HasForeignKey("MenuSectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("FoodDelivery.Domain.ValueObjects.Picture", "Pictures", b1 =>
                         {
-                            b1.Property<Guid>("Id")
+                            b1.Property<Guid>("MenuItemId")
                                 .HasColumnType("uniqueidentifier");
 
-                            b1.Property<Guid>("MenuId")
-                                .HasColumnType("uniqueidentifier");
+                            b1.Property<string>("Url")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)");
 
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)");
+                            b1.HasKey("MenuItemId", "Url");
 
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("MenuId");
-
-                            b1.ToTable("MenuSections", (string)null);
+                            b1.ToTable("MenuItemPictures", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("MenuId");
-
-                            b1.OwnsMany("FoodDelivery.Domain.Entities.MenuItem", "_items", b2 =>
-                                {
-                                    b2.Property<Guid>("Id")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("DeliveryType")
-                                        .HasColumnType("int");
-
-                                    b2.Property<string>("Description")
-                                        .HasMaxLength(500)
-                                        .HasColumnType("nvarchar(500)");
-
-                                    b2.Property<Guid>("MenuSectionId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired()
-                                        .HasMaxLength(100)
-                                        .HasColumnType("nvarchar(100)");
-
-                                    b2.Property<decimal>("Price")
-                                        .HasColumnType("decimal(18,2)");
-
-                                    b2.HasKey("Id");
-
-                                    b2.HasIndex("MenuSectionId");
-
-                                    b2.ToTable("MenuItems", (string)null);
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("MenuSectionId");
-
-                                    b2.OwnsMany("FoodDelivery.Domain.ValueObjects.Ingredient", "_ingredients", b3 =>
-                                        {
-                                            b3.Property<Guid>("MenuItemId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<string>("Name")
-                                                .HasMaxLength(100)
-                                                .HasColumnType("nvarchar(100)");
-
-                                            b3.Property<string>("ImageUrl")
-                                                .IsRequired()
-                                                .HasColumnType("nvarchar(max)");
-
-                                            b3.Property<int>("Type")
-                                                .HasColumnType("int");
-
-                                            b3.HasKey("MenuItemId", "Name");
-
-                                            b3.ToTable("MenuItemIngredients", (string)null);
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("MenuItemId");
-                                        });
-
-                                    b2.OwnsMany("FoodDelivery.Domain.ValueObjects.Picture", "_pictures", b3 =>
-                                        {
-                                            b3.Property<Guid>("MenuItemId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<string>("Url")
-                                                .HasMaxLength(200)
-                                                .HasColumnType("nvarchar(200)");
-
-                                            b3.HasKey("MenuItemId", "Url");
-
-                                            b3.ToTable("MenuItemPictures", (string)null);
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("MenuItemId");
-                                        });
-
-                                    b2.Navigation("_ingredients");
-
-                                    b2.Navigation("_pictures");
-                                });
-
-                            b1.Navigation("_items");
+                                .HasForeignKey("MenuItemId");
                         });
 
-                    b.Navigation("_sections");
+                    b.Navigation("MenuSection");
+
+                    b.Navigation("Pictures");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuItemIngredient", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.Ingredient", "Ingredient")
+                        .WithMany("MenuItemIngredients")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FoodDelivery.Domain.Entities.MenuItem", "MenuItem")
+                        .WithMany("MenuItemIngredients")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("MenuItem");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuSection", b =>
+                {
+                    b.HasOne("FoodDelivery.Domain.Entities.Menu", "Menu")
+                        .WithMany("Sections")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -423,6 +471,31 @@ namespace FoodDelivery.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.Ingredient", b =>
+                {
+                    b.Navigation("MenuItemIngredients");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.Menu", b =>
+                {
+                    b.Navigation("Sections");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuItem", b =>
+                {
+                    b.Navigation("MenuItemIngredients");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.MenuSection", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Menu");
                 });
 #pragma warning restore 612, 618
         }
