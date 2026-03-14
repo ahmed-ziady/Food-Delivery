@@ -1,6 +1,6 @@
-﻿using FoodDelivery.Application.Authentication.Authentication;
+﻿using FoodDelivery.Application.Authentication.Interfaces;
+using FoodDelivery.Application.Common;
 using FoodDelivery.Application.Common.Interfaces.Services;
-using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -22,14 +22,14 @@ namespace FoodDelivery.Infrastructure.Authentication.Services
             user.EmailConfirmed = true;
             var now = dateTimeProvider.UtcNow;
 
-            var refreshTokenValue = jwtTokenGenerator.GenerateRefreshTokenValue();
+            var refreshTokenValue =  jwtTokenGenerator.GenerateRefreshTokenValue();
             var refreshTokenExpiry = now.AddMinutes(20);
 
             user.IssueRefreshToken(refreshTokenValue, refreshTokenExpiry);
 
             await userManager.UpdateAsync(user);
 
-            var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
+            var accessToken = await jwtTokenGenerator.GenerateAccessToken(user);
 
             return new AuthenticationResult(
                 accessToken,

@@ -1,5 +1,4 @@
-﻿using FoodDelivery.Application.Services.Authentication.Common;
-using MediatR;
+﻿using MediatR;
 
 namespace FoodDelivery.Application.Authentication.Commands.Register
 {

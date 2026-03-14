@@ -10,11 +10,11 @@ using System.Text;
 
 namespace FoodDelivery.Application.Account.Commands.UpdateProfileImage
 {
-    public sealed class UploadProfileImageHandler(IUserRepository userRepository, IImageStorageService imageStorageService) : IRequestHandler<UploadProfileImageCommand, AccountResult>
+    public sealed class UploadProfileImageHandler(IUserService userService, IImageStorageService imageStorageService) : IRequestHandler<UploadProfileImageCommand, AccountResult>
     {
         public async Task<AccountResult> Handle(UploadProfileImageCommand request, CancellationToken cancellationToken)
         {
-           var user = await userRepository.GetByIdAsync(request.UserId, cancellationToken) ?? throw new NotFoundException(
+           var user = await userService.GetByIdAsync(request.UserId) ?? throw new NotFoundException(
                 "Account.NotFound",
                 "Account not found.");
 
@@ -31,7 +31,7 @@ namespace FoodDelivery.Application.Account.Commands.UpdateProfileImage
 
                 user.UpdateProfilePicture(newImageUrl);
                 
-                await userRepository.SaveChangesAsync(cancellationToken);
+                await userService.SaveChangesAsync(cancellationToken);
 
             }
             catch

@@ -1,6 +1,6 @@
-﻿using FoodDelivery.Application.Authentication.Authentication;
+﻿using FoodDelivery.Application.Authentication.Interfaces;
+using FoodDelivery.Application.Common;
 using FoodDelivery.Application.Common.Interfaces.Services;
-using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -36,8 +36,7 @@ public sealed class RefreshCommandHandler(
 
         await userManager.UpdateAsync(user);
 
-        // 🔑 Generate new access token
-        var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
+        var accessToken =await jwtTokenGenerator.GenerateAccessToken(user);
 
         return new AuthenticationResult(
             accessToken,

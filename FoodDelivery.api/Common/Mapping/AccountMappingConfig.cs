@@ -18,8 +18,8 @@ namespace FoodDelivery.api.Common.Mapping
            .Map(dest => dest.FirstName, src => src.request.FirstName)
            .Map(dest => dest.LastName, src => src.request.LastName)
            .Map(dest => dest.Bio, src => src.request.Bio);
-            config.NewConfig<(ChangeEmailRequest request, Guid userId), ChangeEmailConfirmCommand>()
-              .Map(dest => dest.UserId, src => src.userId).Map(dest => dest.NewEmail, src => src.request.NewEmail);
+            config.NewConfig<(ConfirmChangeEmailRequest request, Guid userId), ConfirmChangeEmailCommand>()
+              .Map(dest => dest.UserId, src => src.userId).Map(dest => dest.NewEmail, src => src.request.NewEmail).Map(dest => dest.Otp, src => src.request.Otp);
             config.NewConfig<AccountResult, AccountResponse>();
         }
     }

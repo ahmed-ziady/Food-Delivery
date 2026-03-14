@@ -1,7 +1,7 @@
-﻿using FoodDelivery.Application.Authentication.Authentication;
+﻿using FoodDelivery.Application.Authentication.Interfaces;
+using FoodDelivery.Application.Common;
 using FoodDelivery.Application.Common.Interfaces.Persistence;
 using FoodDelivery.Application.Common.Interfaces.Services;
-using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 namespace FoodDelivery.Application.Authentication.Commands.Login;
 
 public sealed class LoginCommandHandler(
-    UserManager<User> userManager,
+    IUserService userService,
     IMenuRepository menuRepository,
     IJwtTokenGenerator jwtTokenGenerator,
     IDateTimeProvider dateTimeProvider)
@@ -19,9 +19,9 @@ public sealed class LoginCommandHandler(
         LoginCommand command,
         CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByEmailAsync(command.Email)??throw new UnauthorizedAccessException("Invalid email or password.");
+        var user = await userService.GetByEmailAsync(command.Email)??throw new UnauthorizedAccessException("Invalid email or password.");
         
-        var passwordValid = await userManager.CheckPasswordAsync(
+        var passwordValid = await userService.CheckPasswordAsync(
             user,
             command.Password);
 
@@ -36,9 +36,9 @@ public sealed class LoginCommandHandler(
 
         user.IssueRefreshToken(refreshTokenValue, refreshTokenExpiry);
 
-        await userManager.UpdateAsync(user);
+        await userService.UpdateAsync(user);
 
-        var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
+        var accessToken = await jwtTokenGenerator.GenerateAccessToken(user);
         if (menuRepository.GetByRestaurantIdAsync(user.Id, cancellationToken).Result is not null)
         {
             return new AuthenticationResult(

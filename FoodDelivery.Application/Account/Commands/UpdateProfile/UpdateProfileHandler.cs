@@ -9,15 +9,15 @@ using Microsoft.AspNetCore.WebUtilities;
 namespace FoodDelivery.Application.Account.Commands.UpdateProfile
 {
     public sealed class UpdateProfileHandler(
-        IUserRepository userRepository)
+        IUserService userService)
         : IRequestHandler<UpdateProfileCommand, AccountResult>
     {
         public async Task<AccountResult> Handle(
             UpdateProfileCommand request,
             CancellationToken cancellationToken)
         {
-            var user = await userRepository
-                .GetByIdAsync(request.UserId, cancellationToken)
+            var user = await userService
+                .GetByIdAsync(request.UserId)
                 ?? throw new NotFoundException(
                     "Account.NotFound",
                     "Account not found.");
@@ -27,7 +27,7 @@ namespace FoodDelivery.Application.Account.Commands.UpdateProfile
                     request.LastName,
                     request.Bio);
 
-            await userRepository.SaveChangesAsync(cancellationToken);
+            await userService.SaveChangesAsync(cancellationToken);
 
             return  user.ToAccountResult();
         }

@@ -1,4 +1,5 @@
-﻿using FoodDelivery.Domain.Entities;
+﻿using FoodDelivery.Application.Common.Interfaces.Persistence;
+using FoodDelivery.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -7,12 +8,14 @@ namespace FoodDelivery.Infrastructure.Persistence;
 
 public sealed class FoodDeliveryDbContext(
     DbContextOptions<FoodDeliveryDbContext> options)
-        : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options)
+        : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options) ,IApplicationDbContext
+
 {
 
     // Your business DbSets
     public DbSet<Menu> Menus { get; set; }
     public DbSet<Ingredient> Ingredients => Set<Ingredient>();
+    public DbSet<Address> Addresses => Set<Address>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

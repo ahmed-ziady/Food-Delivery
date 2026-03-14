@@ -1,10 +1,10 @@
 ﻿using FoodDelivery.Domain.Entities;
 
-namespace FoodDelivery.Application.Authentication.Authentication;
+namespace FoodDelivery.Application.Authentication.Interfaces;
 
 public interface IJwtTokenGenerator
 {
-    string GenerateAccessToken(User user);
+   Task<  string> GenerateAccessToken(User user);
 
     string GenerateRefreshTokenValue();
 }

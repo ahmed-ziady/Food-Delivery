@@ -1,4 +1,5 @@
-﻿using FoodDelivery.Application.Sections.Common;
+﻿using FoodDelivery.Application.Account.Commands.Address.Comman;
+using FoodDelivery.Application.Sections.Common;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Domain.ValueObjects;
 using Mapster;
@@ -30,6 +31,11 @@ namespace FoodDelivery.Application.Common.Mapping
 
             // Picture -> PictureDto
             config.NewConfig<Picture, PictureDto>();
+
+
+            TypeAdapterConfig<Address, AddressResult>.NewConfig()
+            .Map(dest => dest.Lat, src => src.Location.Y)
+            .Map(dest => dest.Lng, src => src.Location.X);
         }
     }
 }

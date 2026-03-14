@@ -25,7 +25,6 @@ public class MenuRepository(FoodDeliveryDbContext db) : IMenuRepository
             .FirstOrDefaultAsync(m => m.Id == id, cancellationToken); 
     }
 
-    // keep this: returns a tracked Menu with Sections and Items included
     public async Task<Menu?> GetByRestaurantIdAsync(Guid restaurantId, CancellationToken cancellationToken)
     {
         return await db.Menus

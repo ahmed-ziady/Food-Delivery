@@ -6,7 +6,7 @@ using FoodDelivery.Application.Authentication.Commands.Register;
 using FoodDelivery.Application.Authentication.Commands.ResendVerificationCode;
 using FoodDelivery.Application.Authentication.Commands.ResetPassword;
 using FoodDelivery.Application.Authentication.Commands.VerifyOtp;
-using FoodDelivery.Application.Services.Authentication.Common;
+using FoodDelivery.Application.Common;
 using FoodDelivery.Contracts.Authentication;
 using FoodDelivery.Contracts.RefreshToken;
 using Mapster;

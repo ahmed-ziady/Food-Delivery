@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Application.Services.Authentication.Common;
+﻿using FoodDelivery.Application.Common;
 using MediatR;
 
 namespace FoodDelivery.Application.Authentication.Commands.VerifyOtp

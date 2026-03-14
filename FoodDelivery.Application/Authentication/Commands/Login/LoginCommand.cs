@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Application.Services.Authentication.Common;
+﻿using FoodDelivery.Application.Common;
 using MediatR;
 using System;
 using System.Collections.Generic;

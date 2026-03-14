@@ -2,6 +2,7 @@
 using FoodDelivery.Application.Common.Interfaces;
 using FoodDelivery.Application.Common.Interfaces.Persistence;
 using FoodDelivery.Application.Menus.Commands.Items.AddItemPictures;
+using FoodDelivery.Domain.Common.Exceptions;
 using FoodDelivery.Domain.Commons.Exceptions;
 using FoodDelivery.Domain.ValueObjects;
 using MediatR;

@@ -1,4 +1,5 @@
-﻿using FoodDelivery.Domain.Commons;
+﻿using FoodDelivery.Domain.Common.Exceptions;
+using FoodDelivery.Domain.Commons;
 using FoodDelivery.Domain.Commons.Exceptions;
 using FoodDelivery.Domain.Enums;
 using FoodDelivery.Domain.ValueObjects;
@@ -16,10 +17,10 @@ public class MenuItem
     public Guid MenuSectionId { get; private set; }
     public MenuSection MenuSection { get; private set; } = null!;
 
-    private readonly List<Picture> _pictures = new();
+    private readonly List<Picture> _pictures = [];
     public IReadOnlyCollection<Picture> Pictures => _pictures;
 
-    private readonly List<MenuItemIngredient> _menuItemIngredients = new();
+    private readonly List<MenuItemIngredient> _menuItemIngredients = [];
     public IReadOnlyCollection<MenuItemIngredient> MenuItemIngredients => _menuItemIngredients;
 
     private const int MaxPictures = 5;

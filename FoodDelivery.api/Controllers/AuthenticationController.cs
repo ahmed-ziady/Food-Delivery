@@ -12,6 +12,7 @@ using FoodDelivery.Contracts.RefreshToken;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FoodDelivery.api.Controllers
 {
@@ -19,34 +20,25 @@ namespace FoodDelivery.api.Controllers
     [ApiController]
     public class AuthenticationController(ISender _demdiator, IMapper _mapper) : ControllerBase
     {
+        [EnableRateLimiting("register-limit")]
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
             var command = _mapper.Map<RegisterCommand>(request);
             await _demdiator.Send(command);
-
-            return Accepted(new
-            {
-
-                Message = "Registration successful. Please check your email to verify your account."
-
-            });
+            return Accepted(new { Message = "Registration successful. Please check your email to verify your account." });
         }
+
+        [EnableRateLimiting("register-limit")]
         [HttpPost("resend-v-code")]
-        public async Task<IActionResult> ResendVerificationCode(
-     ResendVerificatonCodeRequest request)
+        public async Task<IActionResult> ResendVerificationCode( ResendVerificatonCodeRequest request)
         {
             var command = _mapper.Map<ResendVerificationCodeCommand>(request);
-
             await _demdiator.Send(command);
-
-            return Accepted(new
-            {
-                Message = "If the email exists, a verification code has been sent."
-            });
+            return Accepted(new {  Message = "If the email exists, a verification code has been sent." });
         }
 
-
+        [EnableRateLimiting("login-limit")]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
@@ -56,6 +48,8 @@ namespace FoodDelivery.api.Controllers
             return Ok(authResponse);
 
         }
+
+        [EnableRateLimiting("user-limit")]
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(RefreshTokenRequest request)
         {
@@ -64,6 +58,8 @@ namespace FoodDelivery.api.Controllers
             var authResponse = _mapper.Map<AuthenticationResponse>(response);
             return Ok(authResponse);
         }
+
+        [EnableRateLimiting("user-limit")]
         [HttpPost("verifyEmail")]
         public async Task<IActionResult> VerifyEmail(VerifyEmailRequest request)
         {
@@ -75,6 +71,7 @@ namespace FoodDelivery.api.Controllers
 
         }
 
+        [EnableRateLimiting("login-limit")]
         [HttpPost("external/google")]
         public async Task<IActionResult> GoogleLogin(GoogleLoginRequest request)
         {
@@ -83,6 +80,8 @@ namespace FoodDelivery.api.Controllers
             var authResponse = _mapper.Map<AuthenticationResponse>(response);
             return Ok(authResponse);
         }
+
+        [EnableRateLimiting("login-limit")]
         [HttpPost("external/facebook")]
         public async Task<IActionResult> FacebookLogin(FacebookLoginRequest request)
         {
@@ -92,6 +91,7 @@ namespace FoodDelivery.api.Controllers
             return Ok(authResponse);
         }
 
+        [EnableRateLimiting("register-limit")]
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPasswordAsync(ForgotPasswordRequest request)
         {
@@ -100,6 +100,7 @@ namespace FoodDelivery.api.Controllers
             return Accepted(new { Message = "Please check your email to verify your email." });
         }
 
+        [EnableRateLimiting("register-limit")]
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequest request)
         {
@@ -109,5 +110,6 @@ namespace FoodDelivery.api.Controllers
 
 
         }
+
     }
 }

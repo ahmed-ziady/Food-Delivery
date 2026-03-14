@@ -1,4 +1,5 @@
-﻿using FoodDelivery.Application.Common.Interfaces.Twilio;
+﻿using FoodDelivery.Application.Common.Interfaces.Persistence;
+using FoodDelivery.Application.Common.Interfaces.Twilio;
 using FoodDelivery.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 namespace FoodDelivery.Application.Authentication.Commands.Register
 {
     public sealed class RegisterCommandHandler(
-        UserManager<User> userManager,
+        IUserService userService,
         IMailingService mailingService)
                 : IRequestHandler<RegisterCommand, Unit>
     {
@@ -16,7 +17,7 @@ namespace FoodDelivery.Application.Authentication.Commands.Register
         {
             var email = command.Email.Trim().ToLower();
 
-            var existingUser = await userManager.FindByEmailAsync(email);
+            var existingUser = await userService.GetByEmailAsync(email);
 
             if (existingUser is not null)
                 throw new InvalidOperationException("Email already exists.");
@@ -28,7 +29,7 @@ namespace FoodDelivery.Application.Authentication.Commands.Register
                 command.PhoneNumber.Trim()
             );
 
-            var result = await userManager.CreateAsync(user, command.Password);
+            var result = await userService.CreateAsync(user, command.Password);
 
             if (!result.Succeeded)
             {
@@ -37,9 +38,8 @@ namespace FoodDelivery.Application.Authentication.Commands.Register
             }
 
             // Generate OTP
-            var token = await userManager.GenerateTwoFactorTokenAsync(
-                user,
-                TokenOptions.DefaultEmailProvider);
+            var token = await userService.GenerateEmailTokenAsync(
+                user);
 
             // Send Email
             await mailingService.SendEmailAsync(

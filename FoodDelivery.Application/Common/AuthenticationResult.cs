@@ -1,4 +1,4 @@
-﻿namespace FoodDelivery.Application.Services.Authentication.Common
+﻿namespace FoodDelivery.Application.Common
 {
     public record AuthenticationResult
         (

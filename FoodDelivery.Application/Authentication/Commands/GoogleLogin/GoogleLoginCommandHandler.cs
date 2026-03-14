@@ -1,6 +1,7 @@
 ﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Authentication.Interfaces;
+using FoodDelivery.Application.Common;
 using FoodDelivery.Application.Common.Interfaces.Services;
-using FoodDelivery.Application.Services.Authentication.Common;
 using FoodDelivery.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +19,6 @@ namespace FoodDelivery.Application.Authentication.Commands.GoogleLogin
             GoogleLoginCommand request,
             CancellationToken cancellationToken)
         {
-            // ✅ Use abstraction (Clean Architecture)
             var payload = await googleAuth.ValidateTokenAsync(request.IdToken);
 
             var email = payload.Email.Trim().ToLower();
@@ -26,12 +26,10 @@ namespace FoodDelivery.Application.Authentication.Commands.GoogleLogin
             if (!payload.EmailVerified)
                 throw new UnauthorizedAccessException("Google email is not verified.");
 
-            // ✅ Find existing user
             var user = await userManager.FindByEmailAsync(email);
 
             if (user is null)
             {
-                // ✅ Use your existing constructor pattern
                 user = new User(
                     payload.GivenName ?? "",
                     payload.FamilyName ?? "",
@@ -48,7 +46,6 @@ namespace FoodDelivery.Application.Authentication.Commands.GoogleLogin
                     throw new Exception("Failed to create Google user.");
             }
 
-            // ✅ Generate Refresh Token
             var now = dateTimeProvider.UtcNow;
 
             var refreshTokenValue = jwtTokenGenerator.GenerateRefreshTokenValue();
@@ -57,9 +54,7 @@ namespace FoodDelivery.Application.Authentication.Commands.GoogleLogin
             user.IssueRefreshToken(refreshTokenValue, refreshTokenExpiry);
 
             await userManager.UpdateAsync(user);
-
-            // ✅ Generate Access Token
-            var accessToken = jwtTokenGenerator.GenerateAccessToken(user);
+            var accessToken =await jwtTokenGenerator.GenerateAccessToken(user);
 
             return new AuthenticationResult(
                 accessToken,

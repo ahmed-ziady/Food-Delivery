@@ -7,14 +7,14 @@ using System.Text;
 
 namespace FoodDelivery.Application.Account.Commands.Logout
 {
-    public class LogoutCommandHandler (IUserRepository userRepository)   : IRequestHandler<LogoutCommand, Unit>
+    public class LogoutCommandHandler (IUserService userService)   : IRequestHandler<LogoutCommand, Unit>
     {
         public async Task<Unit> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
-            var user = await userRepository.GetByIdAsync(request.UserId,cancellationToken)??throw new UnauthorizedException("Account.NotFound","User not found.");
+            var user = await userService.GetByIdAsync(request.UserId)??throw new UnauthorizedException("Account.NotFound","User not found.");
 
             user.RevokeRefreshToken();
-          await   userRepository.SaveChangesAsync(cancellationToken);
+          await   userService.SaveChangesAsync(cancellationToken);
             return Unit.Value;
         }
     }

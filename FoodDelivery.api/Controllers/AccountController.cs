@@ -1,4 +1,8 @@
-﻿using FoodDelivery.Application.Account.Commands.ChangeEmail.ChangeEmailConfirm;
+﻿using FoodDelivery.Application.Account.Commands.Address.Commands.DeleteAddress;
+using FoodDelivery.Application.Account.Commands.Address.Commands.SetAddress;
+using FoodDelivery.Application.Account.Commands.Address.Commands.UpdateAddress;
+using FoodDelivery.Application.Account.Commands.Address.Queries;
+using FoodDelivery.Application.Account.Commands.ChangeEmail.ChangeEmailConfirm;
 using FoodDelivery.Application.Account.Commands.ChangeEmail.ChangeEmailRequest;
 using FoodDelivery.Application.Account.Commands.Logout;
 using FoodDelivery.Application.Account.Commands.UpdateProfile;
@@ -10,6 +14,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace FoodDelivery.api.Controllers
 {
@@ -32,8 +37,6 @@ namespace FoodDelivery.api.Controllers
                 _ => Guid.Parse(userIdClaim.Value)
             };
         }
-
-
 
         [HttpGet]
         public async Task<ActionResult<AccountResponse>> GetAccount()
@@ -74,23 +77,56 @@ namespace FoodDelivery.api.Controllers
         }
 
         [HttpPost("change-email")]
-        public async  Task<IActionResult> ChangeEmailAsync()
+        public async Task<IActionResult> ChangeEmailAsync(string newEmail)
         {
             var userId = GetUserId();
-            var command = new ChangeEmailCommand(userId);
+            var command = new ChangeEmailCommand(userId, newEmail);
             await mediator.Send(command);
-            return Accepted(new { Message = "Please check your email to verify your email." });
+            return Accepted(new { Message = "Please check your New email to verify your email." });
         }
 
         [HttpPost("confirm-email-change")]
-        public async Task<IActionResult> ConfirmEmailChange( ChangeEmailRequest request)
+        public async Task<IActionResult> ConfirmEmailChange(ConfirmChangeEmailRequest request)
         {
             var userId = GetUserId();
-            var command = mapper.Map<ChangeEmailConfirmCommand>((request, userId));
+            var command = mapper.Map<ConfirmChangeEmailCommand>((request, userId));
             var result = await mediator.Send(command);
             var response = mapper.Map<AccountResponse>(result);
             return Ok(response);
 
         }
+        [HttpPost("address")]
+        public async Task<IActionResult> SetAddress(SetAddressRequest request)
+        {
+            var userId = GetUserId();
+            var command = mapper.Map<SetAddressCommand>((request, userId));
+            var result = await mediator.Send(command);
+            var response = mapper.Map<AddressResponse>(result);
+            return Ok(response);
+        }
+        [HttpGet("addresses")]
+        public async Task<IActionResult> GetAddressesAsync()
+        {
+            var userId = GetUserId();
+            var query = new GetAddressesQuery(userId);
+            var result = await mediator.Send(query);
+            return Ok(result);
+        }
+        [HttpPut("address")]
+        public async Task<IActionResult> UpdateAddress(UpdateAddressRequest request)
+        {
+            var command = mapper.Map<UpdateAddressCommand>(request);
+            var result = await mediator.Send(command);
+            return Ok(result);
+        }
+        [HttpDelete("address/{id}")]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+
+            var command = new DeleteAddressCommand(id);
+            await mediator.Send(command);
+            return NoContent();
+        }
+
     }
 }

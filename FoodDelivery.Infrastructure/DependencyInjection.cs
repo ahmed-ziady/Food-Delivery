@@ -1,4 +1,5 @@
 ﻿using FoodDelivery.Application.Authentication.Authentication;
+using FoodDelivery.Application.Authentication.Interfaces;
 using FoodDelivery.Application.Common.Interfaces;
 using FoodDelivery.Application.Common.Interfaces.Persistence;
 using FoodDelivery.Application.Common.Interfaces.Services;
@@ -6,6 +7,7 @@ using FoodDelivery.Application.Common.Interfaces.Twilio;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Infrastructure.Authentication.Services;
 using FoodDelivery.Infrastructure.Authentication.Settings;
+using FoodDelivery.Infrastructure.Identity;
 using FoodDelivery.Infrastructure.Persistence;
 using FoodDelivery.Infrastructure.Persistence.Repositories;
 using FoodDelivery.Infrastructure.Service;
@@ -30,16 +32,16 @@ public static class DependencyInjection
             .AddPersistence(configuration)
             .AddAuth(configuration).
             AddIdentity();
-        services.AddScoped<IUserRepository, UserRepository>();  
-        services.AddScoped<IMenuRepository , MenuRepository>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IMenuRepository, MenuRepository>();
         services.AddScoped<IIngredientRepository, IngredientRepository>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         //services.Configure<TwilioSettings>(configuration.GetSection(TwilioSettings.SectionName));   
         //services.AddScoped<ISmsService, TwilioSmsService>();
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
         services.Configure<GoogleAuthSettings>(configuration.GetSection(GoogleAuthSettings.SectionName));
-        services .Configure<FacebookAuthSettings>(configuration.GetSection(FacebookAuthSettings.SectionName));
-        services.AddScoped<IFacebookAuthValidator, FacebookAuthValidator>();    
+        services.Configure<FacebookAuthSettings>(configuration.GetSection(FacebookAuthSettings.SectionName));
+        services.AddScoped<IFacebookAuthValidator, FacebookAuthValidator>();
         services.AddScoped<IGoogleAuthValidator, GoogleAuthValidator>();
         services.AddHttpClient();
         services.AddTransient<IMailingService, EmailService>();
@@ -53,12 +55,15 @@ public static class DependencyInjection
     public static IServiceCollection AddPersistence(
         this IServiceCollection services,
         ConfigurationManager configuration)
-    {
+            {
         services.AddDbContext<FoodDeliveryDbContext>(options =>
             options.UseSqlServer(
-                configuration.GetConnectionString("DefaultConnection")));
+                configuration.GetConnectionString("DefaultConnection"),
+                x => x.UseNetTopologySuite()
+            ));
 
-
+        services.AddScoped<IApplicationDbContext>(sp =>
+             sp.GetRequiredService<FoodDeliveryDbContext>());
 
         // Only keep real repositories
         services.AddScoped<IMenuRepository, MenuRepository>();
@@ -76,7 +81,7 @@ public static class DependencyInjection
             options.Password.RequiredLength = 6;
             options.User.RequireUniqueEmail = true;
             options.SignIn.RequireConfirmedEmail = true;
-        })
+        }).AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<FoodDeliveryDbContext>()
         .AddDefaultTokenProviders();
         return services;
@@ -89,7 +94,7 @@ public static class DependencyInjection
         configuration.Bind(JwtSettings.SectionName, jwtSettings);
 
         services.AddSingleton(Options.Create(jwtSettings));
-        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IVerifyOtp, VerificationOtpService>();
         services.AddAuthentication(
                 JwtBearerDefaults.AuthenticationScheme)
@@ -111,7 +116,8 @@ public static class DependencyInjection
                     };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorization(
+            PermissionPolicyRegistration.RegisterPolicies);
 
         return services;
     }

@@ -5,11 +5,11 @@ using MediatR;
 
 namespace FoodDelivery.Application.Account.Queries;
 
-public sealed class GetAccountHandler(IUserRepository userRepository) : IRequestHandler<GetAccountQuery, AccountResult>
+public sealed class GetAccountHandler(IUserService userService) : IRequestHandler<GetAccountQuery, AccountResult>
 {
     public async Task<AccountResult> Handle(GetAccountQuery request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetByIdAsync(request.UserId, cancellationToken)?? throw new UnauthorizedAccessException("Access Denied");
+        var user = await userService.GetByIdAsync(request.UserId)?? throw new UnauthorizedAccessException("Access Denied");
 
         return user.ToAccountResult();
     }

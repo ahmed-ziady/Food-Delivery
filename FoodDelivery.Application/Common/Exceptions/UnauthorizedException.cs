@@ -1,7 +1,6 @@
 ﻿namespace FoodDelivery.Application.Common.Exceptions
 {
-    public sealed class UnauthorizedException : AppException
+    public sealed class UnauthorizedException(string code, string message) : AppException(code, message)
     {
-        public UnauthorizedException(string code, string message) : base(code, message) { }
     }
 }
